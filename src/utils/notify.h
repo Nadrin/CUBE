@@ -8,20 +8,22 @@ public:
 	struct Handler {
 		virtual void operator()() = 0;
 	};
-
 protected:
-	HANDLE hDirectoryHandle;
 	HANDLE hNotifyHandle;
 	HANDLE hWaitHandle;
-	CRITICAL_SECTION hLock;
+	HANDLE hEventHandle;
 
-	std::map<std::string, ULONGLONG> pendingEvents;
-	std::map<std::string, FileNotify::Handler*> eventHandlers;
+	std::string basePath;
+	ULONGLONG eventTimestamp;
+	unsigned long eventDelay;
+	FILETIME processTimestamp;
+
+	std::map<std::string, FileNotify::Handler*> fileMap;
 protected:
 	static void CALLBACK NotifyWaitCallback(PVOID lpParameter, BOOLEAN TimerOrWaitFired);
-	bool PushEvent(const std::string& name);
+	FILETIME GetFileModificationTime(const std::string& name);
 public:
-	FileNotify(const std::string& path);
+	FileNotify(const std::string& path, unsigned long delay=100);
 	~FileNotify();
 
 	bool RegisterHandler(const std::string& name, FileNotify::Handler* handler);
