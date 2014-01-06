@@ -4,6 +4,8 @@
 
 namespace CUBE {
 
+typedef std::function<bool (float)> RenderingFunction;
+
 class Global
 {
 private:
@@ -35,7 +37,7 @@ public:
 	static void  Seek(const float delta);
 	static void  TogglePlayback();
 
-	static int   Run();
+	static int   Run(RenderingFunction func);
 };
 
 } // CUBE

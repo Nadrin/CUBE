@@ -2,6 +2,7 @@
 
 #include <stdafx.h>
 #include <core/global.h>
+#include <utils/notify.h>
 
 using namespace CUBE;
 
@@ -12,5 +13,19 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	Global::OpenStream("music.mp3");
 	Global::OpenDisplay(1920, 1080, false);
 
-	return Global::Run();
+	struct TestHandler : public FileNotify::Handler {
+		virtual void operator()() override 
+		{
+			Global::Log("EXEC!\n");
+		}
+	} TestHandlerObject;
+
+	FileNotify notify("\\shaders");
+	notify.RegisterHandler("test.txt", &TestHandlerObject);
+
+	return Global::Run([&](float time)
+	{
+		notify.ProcessEvents();
+		return true;
+	});
 }

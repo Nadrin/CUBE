@@ -44,6 +44,8 @@ void Global::UpdateDebugInfo()
 
 void Global::Init(const char* name)
 {
+	std::setlocale(LC_ALL, "en_US.UTF-8");
+
 #ifdef _DEBUG
 	AllocConsole();
 	SetConsoleTitleA("Debug Console");
@@ -125,7 +127,7 @@ float Global::GetTime()
 	return (float)BASS_ChannelBytes2Seconds(stream, BASS_ChannelGetPosition(stream, BASS_POS_BYTE));
 }
 
-int Global::Run()
+int Global::Run(RenderingFunction func)
 {
 	BASS_ChannelPlay(stream, TRUE);
 
@@ -133,6 +135,8 @@ int Global::Run()
 #ifdef _DEBUG
 		Global::UpdateDebugInfo();
 #endif
+		if(!func(GetTime()))
+			break;
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
