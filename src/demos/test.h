@@ -2,12 +2,14 @@
 
 #pragma once
 
+#include <core/demo.h>
+
 namespace CUBE {
 
-class Shader
+class TestDemo : public Demo
 {
 public:
-
+	void Run() override;
 };
 
 } // CUBE

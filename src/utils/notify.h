@@ -1,3 +1,5 @@
+/* CUBE demo toolkit by MasterM/Asenses */
+
 #pragma once
 
 namespace CUBE {

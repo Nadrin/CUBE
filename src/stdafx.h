@@ -18,5 +18,8 @@
 #include <GL/wglew.h>
 #include <GLFW/glfw3.h>
 #include <bass.h>
-
 #include <glm/glm.hpp>
+
+#ifdef _DEBUG
+#include <AntTweakBar.h>
+#endif

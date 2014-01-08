@@ -1,3 +1,5 @@
+/* CUBE demo toolkit by MasterM/Asenses */
+
 #include <stdafx.h>
 #include <core/global.h>
 #include <utils/notify.h>
