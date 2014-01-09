@@ -6,10 +6,10 @@
 
 namespace CUBE {
 
-class TestDemo : public Demo
+class TestDemo : public Core::Demo
 {
 public:
-	void Run() override;
+	void Main() override;
 };
 
 } // CUBE

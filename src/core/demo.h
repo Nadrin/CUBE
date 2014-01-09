@@ -2,15 +2,15 @@
 
 #pragma once
 
-#define render auto RenderFunction = [&](float Time)
-#define commit Global::Run(RenderFunction)
-
 namespace CUBE {
+namespace Core {
 
 class Demo
 {
 public:
-	virtual void Run() = 0;
+	static void  Implementation();
+	virtual void Main() = 0;
 };
 
+} // Core
 } // CUBE

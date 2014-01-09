@@ -1,7 +1,7 @@
 /* CUBE demo toolkit by MasterM/Asenses */
 
 #include <stdafx.h>
-#include <core/global.h>
+#include <core/system.h>
 #include <utils/notify.h>
 #include <utils/lock.h>
 

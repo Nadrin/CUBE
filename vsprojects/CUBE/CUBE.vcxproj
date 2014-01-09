@@ -85,10 +85,12 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(SolutionDir)\lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>opengl32.lib;glfw3dll.lib;glew32.lib;bass.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\core\global.cpp" />
+    <ClCompile Include="..\..\src\core\system.cpp" />
+    <ClCompile Include="..\..\src\core\ui.cpp" />
     <ClCompile Include="..\..\src\demos\test.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />
     <ClCompile Include="..\..\src\stdafx.cpp">
@@ -98,9 +100,11 @@
     <ClCompile Include="..\..\src\utils\notify.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\src\core\declarative.h" />
     <ClInclude Include="..\..\src\core\demo.h" />
-    <ClInclude Include="..\..\src\core\global.h" />
+    <ClInclude Include="..\..\src\core\system.h" />
     <ClInclude Include="..\..\src\core\shader.h" />
+    <ClInclude Include="..\..\src\core\ui.h" />
     <ClInclude Include="..\..\src\demos\test.h" />
     <ClInclude Include="..\..\src\stdafx.h" />
     <ClInclude Include="..\..\src\utils\lock.h" />

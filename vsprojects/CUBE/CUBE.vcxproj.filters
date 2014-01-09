@@ -39,22 +39,22 @@
     <ClCompile Include="..\..\src\stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\core\global.cpp">
-      <Filter>Source Files\core</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\utils\notify.cpp">
       <Filter>Source Files\utils</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\demos\test.cpp">
       <Filter>Source Files\demos</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\core\ui.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\core\system.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\stdafx.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\core\global.h">
-      <Filter>Header Files\core</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\core\shader.h">
       <Filter>Header Files\core</Filter>
@@ -70,6 +70,15 @@
     </ClInclude>
     <ClInclude Include="..\..\src\demos\test.h">
       <Filter>Header Files\demos</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\core\ui.h">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\core\system.h">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\core\declarative.h">
+      <Filter>Header Files\core</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

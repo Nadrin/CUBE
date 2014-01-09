@@ -1,17 +1,22 @@
 /* CUBE demo toolkit by MasterM/Asenses */
 
 #include <stdafx.h>
-#include <core/global.h>
+#include <core/system.h>
+#include <core/ui.h>
+#include <core/declarative.h>
+
 #include <demos/test.h>
 
 using namespace CUBE;
 
-void TestDemo::Run()
+IMPLEMENT_DEMO(TestDemo)
+
+void TestDemo::Main()
 {
-	Global::SetName("CUBE: Test Demo");
-	Global::UseOpenGL(4, 3);
-	Global::OpenStream("music.mp3");
-	Global::OpenDisplay(1920, 1080, false);
+	System->SetName("CUBE: Test Demo");
+	System->UseOpenGL(4, 3);
+	System->OpenDisplay(1920, 1080, false);
+	System->OpenStream("music.mp3");
 
 	render {
 		glClear(GL_COLOR_BUFFER_BIT);
