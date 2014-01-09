@@ -83,17 +83,60 @@ void TweakBarUI::Draw()
 		TwDraw();
 }
 
+void TweakBarUI::ParseName(const std::string& name, std::string& varname, std::string& vargrp)
+{
+	size_t separator = name.find_first_of('/', 0);
+	if(separator == std::string::npos) {
+		varname = name;
+		vargrp  = std::string();
+	}
+	else {
+		varname = name.substr(separator+1);
+		vargrp  = name.substr(0, separator);
+	}
+}
+
 TwBar* TweakBarUI::AddBar(const std::string& name)
 {
-	return nullptr;
+	return TwNewBar(name.c_str());
 }
 
 void TweakBarUI::AddVariable(TwBar* bar, const std::string& name, TwType type, void* data)
 {
+	AddVariable(bar, name, type, data, std::string());
+}
+
+void TweakBarUI::AddVariable(TwBar* bar, const std::string& name, TwType type, void* data, const std::string& def)
+{
+	std::stringstream buffer;
+	buffer << def << " ";
+
+	std::string varname, vargrp;
+	ParseName(name, varname, vargrp);
+
+	if(!vargrp.empty()) {
+		buffer << "group='" << vargrp << "'";
+	}
+	TwAddVarRW(bar, varname.c_str(), type, data, buffer.str().c_str());
 }
 
 void TweakBarUI::AddSeparator(TwBar* bar, const std::string& name)
 {
+	AddSeparator(bar, name, std::string());
+}
+
+void TweakBarUI::AddSeparator(TwBar* bar, const std::string& name, const std::string& def)
+{
+	std::stringstream buffer;
+	buffer << def << " ";
+
+	std::string varname, vargrp;
+	ParseName(name, varname, vargrp);
+
+	if(!vargrp.empty()) {
+		buffer << "group='" << vargrp << "'";
+	}
+	TwAddSeparator(bar, varname.c_str(), buffer.str().c_str());
 }
 
 #endif

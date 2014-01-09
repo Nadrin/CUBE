@@ -19,7 +19,9 @@ public:
 
 	virtual TwBar* AddBar(const std::string& name) { return nullptr; }
 	virtual void   AddVariable(TwBar* bar, const std::string& name, TwType type, void* data) {}
+	virtual void   AddVariable(TwBar* bar, const std::string& name, TwType type, void* data, const std::string& def) {}
 	virtual void   AddSeparator(TwBar* bar, const std::string& name) {}
+	virtual void   AddSeparator(TwBar* bar, const std::string& name, const std::string& def) {}
 
 	virtual void   Draw() {}
 };
@@ -38,6 +40,8 @@ protected:
 	static void MousePositionCallback(GLFWwindow* window, double xpos, double ypos);
 	static void MouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 	static void UnicodeCharCallback(GLFWwindow* window, unsigned int character);
+protected:
+	static void ParseName(const std::string& name, std::string& varname, std::string& vargrp);
 public:
 	TweakBarUI(GLFWwindow* window, const int width, const int height);
 	virtual ~TweakBarUI();
@@ -46,7 +50,9 @@ public:
 
 	virtual TwBar* AddBar(const std::string& name) override;
 	virtual void   AddVariable(TwBar* bar, const std::string& name, TwType type, void* data) override;
+	virtual void   AddVariable(TwBar* bar, const std::string& name, TwType type, void* data, const std::string& def) override;
 	virtual void   AddSeparator(TwBar* bar, const std::string& name) override;
+	virtual void   AddSeparator(TwBar* bar, const std::string& name, const std::string& def) override;
 
 	virtual void   Draw() override;
 };

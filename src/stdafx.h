@@ -7,6 +7,7 @@
 #include <clocale>
 #include <exception>
 #include <string>
+#include <sstream>
 #include <queue>
 #include <map>
 #include <functional>
