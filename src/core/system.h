@@ -44,6 +44,7 @@ public:
 
 	 void  TogglePlayback();
 	 void  ToggleUI();
+	 void  ArrangeUI();
 
 	 void  Run(RenderBlock render);
 };

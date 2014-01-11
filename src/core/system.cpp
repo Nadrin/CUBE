@@ -36,6 +36,9 @@ void System::KeyCallback(GLFWwindow* window, int key, int scancode, int action, 
 	case GLFW_KEY_F1:
 		if(action == GLFW_PRESS) System::Instance()->ToggleUI();
 		return;
+	case GLFW_KEY_F2:
+		if(action == GLFW_PRESS) System::Instance()->ArrangeUI();
+		return;
 	case GLFW_KEY_SPACE:
 		if(action == GLFW_PRESS) System::Instance()->TogglePlayback();
 		return;
@@ -235,6 +238,12 @@ void System::TogglePlayback()
 void System::ToggleUI()
 {
 	UI->Toggle();
+}
+
+void System::ArrangeUI()
+{
+	if(UI->IsActive())
+		UI->Arrange();
 }
 
 void System::Seek(const float delta)

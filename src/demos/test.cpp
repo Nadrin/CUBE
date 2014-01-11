@@ -18,6 +18,8 @@ void TestDemo::Main()
 	System->OpenDisplay(1920, 1080, false);
 	System->OpenStream("music.mp3");
 
+	UI->Placement = PlacementMode::Horizontal;
+
 	render {
 		glClear(GL_COLOR_BUFFER_BIT);
 		return true;

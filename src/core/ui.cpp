@@ -9,7 +9,8 @@ using namespace CUBE::Core;
 
 #ifdef _DEBUG
 
-TweakBarUI::TweakBarUI(GLFWwindow* window, const int width, const int height) : UI()
+TweakBarUI::TweakBarUI(GLFWwindow* window, const int width, const int height) 
+	: UI(), ClientWidth(width), ClientHeight(height)
 {
 	TwInit(TW_OPENGL_CORE, nullptr);
 	TwWindowSize(width, height);
@@ -49,7 +50,7 @@ void TweakBarUI::TranslateKeyEvent(int key, int action)
 	if(action == GLFW_REPEAT) tw_action = GLFW_PRESS;
 	else tw_action = action;
 
-	if(active)
+	if(Active)
 		TwEventKeyGLFW(tw_key, tw_action);
 }
 
@@ -77,13 +78,7 @@ void TweakBarUI::UnicodeCharCallback(GLFWwindow* window, unsigned int character)
 		TwEventCharGLFW(character, GLFW_PRESS);
 }
 
-void TweakBarUI::Draw()
-{
-	if(active)
-		TwDraw();
-}
-
-void TweakBarUI::ParseName(const std::string& name, std::string& varname, std::string& vargrp)
+void TweakBarUI::ParseName(const std::string& name, std::string& varname, std::string& vargrp) const
 {
 	size_t separator = name.find_first_of('/', 0);
 	if(separator == std::string::npos) {
@@ -96,9 +91,72 @@ void TweakBarUI::ParseName(const std::string& name, std::string& varname, std::s
 	}
 }
 
+void TweakBarUI::PlaceBar(TwBar* bar, const int maxIndex)
+{
+	struct BarInfo {
+		int position[2];
+		int size[2];
+	};
+
+	if(Placement == PlacementMode::None)
+		return;
+
+	BarInfo info, otherInfo;
+	TwGetParam(bar, NULL, "size", TW_PARAM_INT32, 2, info.size);
+
+	int stepSize = 0;
+	for(int i=1; i<maxIndex; i++) {
+		TwBar* other = TwGetBarByIndex(i);
+		TwGetParam(other, NULL, "size", TW_PARAM_INT32, 2, otherInfo.size);
+
+		switch(Placement) {
+		case PlacementMode::Horizontal:
+			if(otherInfo.size[1] > stepSize)
+				stepSize = otherInfo.size[1];
+			break;
+		case PlacementMode::Vertical:
+			if(otherInfo.size[0] > stepSize)
+				stepSize = otherInfo.size[0];
+			break;
+		}
+	}
+
+	info.position[0] = Padding;
+	info.position[1] = Padding;
+	for(int i=1; i<maxIndex-1; i++) {
+		TwBar* other = TwGetBarByIndex(i);
+
+		TwGetParam(other, NULL, "position", TW_PARAM_INT32, 2, otherInfo.position);
+		TwGetParam(other, NULL, "size", TW_PARAM_INT32, 2, otherInfo.size);
+
+		switch(Placement) {
+		case PlacementMode::Horizontal:
+			info.position[0] += otherInfo.size[0] + Padding;
+			if(info.position[0] + info.size[0] > ClientWidth) {
+				info.position[0]  = Padding;
+				info.position[1] += stepSize + Padding;
+			}
+			break;
+		case PlacementMode::Vertical:
+			info.position[1] += otherInfo.size[1] + Padding;
+			if(info.position[1] + info.size[1] > ClientHeight) {
+				info.position[0] += stepSize + Padding;
+				info.position[1]  = Padding;
+			}
+			break;
+		}
+	}
+
+	std::stringstream sdef;
+	sdef << TwGetBarName(bar) << " position='" << info.position[0] << " " << info.position[1] << "'";
+	TwDefine(sdef.str().c_str());
+}
+
 TwBar* TweakBarUI::AddBar(const std::string& name)
 {
-	return TwNewBar(name.c_str());
+	TwBar* bar = TwNewBar(name.c_str());
+	PlaceBar(bar, TwGetBarCount());
+	return bar;
 }
 
 void TweakBarUI::AddVariable(TwBar* bar, const std::string& name, TwType type, void* data)
@@ -137,6 +195,25 @@ void TweakBarUI::AddSeparator(TwBar* bar, const std::string& name, const std::st
 		buffer << "group='" << vargrp << "'";
 	}
 	TwAddSeparator(bar, varname.c_str(), buffer.str().c_str());
+}
+
+void TweakBarUI::Clear()
+{
+	TwDeleteAllBars();
+}
+
+void TweakBarUI::Draw()
+{
+	if(Active)
+		TwDraw();
+}
+
+void TweakBarUI::Arrange()
+{
+	for(int i=1; i<TwGetBarCount(); i++) {
+		TwBar* bar = TwGetBarByIndex(i);
+		PlaceBar(bar, i+1);
+	}
 }
 
 #endif
