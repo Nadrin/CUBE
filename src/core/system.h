@@ -50,7 +50,8 @@ public:
 };
 
 } // Global
-} // CUBE
 
-extern class CUBE::Core::System* System;
-extern class CUBE::Core::UI*     UI;
+extern class Core::System* System;
+extern class Core::UI*     UI;
+
+} // CUBE

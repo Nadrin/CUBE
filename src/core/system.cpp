@@ -7,10 +7,11 @@
 #include <cstdio>
 #include <cstdarg>
 
-class CUBE::Core::System* System = nullptr;
-class CUBE::Core::UI* UI         = nullptr;
-
 using namespace CUBE;
+
+class Core::System* CUBE::System = nullptr;
+class Core::UI*     CUBE::UI     = nullptr;
+
 using namespace CUBE::Core;
 
 System::System() : UI(nullptr), paused(false), window(NULL), stream(NULL)
@@ -95,7 +96,7 @@ void System::Init()
 		ExitProcess(1);
 	}
 
-	::System = this;
+	CUBE::System = this;
 	System::Log("CUBE demo toolkit initialized.\n");
 }
 
@@ -112,8 +113,8 @@ void System::Terminate()
 	FreeConsole();
 #endif
 
-	::UI     = nullptr;
-	::System = nullptr;
+	CUBE::UI     = nullptr;
+	CUBE::System = nullptr;
 }
 
 void System::UseOpenGL(const int major, const int minor)
@@ -160,7 +161,7 @@ void System::OpenDisplay(const int width, const int height, bool fullscreen)
 #else
 	System::UI = new Core::NullUI();
 #endif
-	::UI = System::UI;
+	CUBE::UI = System::UI;
 
 	System::Log("Opened display: OpenGL %s (%dx%d)\n", glGetString(GL_VERSION), width, height);
 	System::Log("Renderer: %s %s\n", glGetString(GL_VENDOR), glGetString(GL_RENDERER));
