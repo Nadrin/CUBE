@@ -5,6 +5,8 @@
 #include <core/ui.h>
 #include <core/declarative.h>
 
+#include <utils/parameter.h>
+
 #include <demos/test.h>
 
 using namespace CUBE;

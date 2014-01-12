@@ -3,6 +3,7 @@
 #include <stdafx.h>
 #include <core/system.h>
 #include <core/ui.h>
+#include <utils/parameter.h>
 
 using namespace CUBE;
 using namespace CUBE::Core;
@@ -10,7 +11,7 @@ using namespace CUBE::Core;
 #ifdef _DEBUG
 
 TweakBarUI::TweakBarUI(GLFWwindow* window, const int width, const int height) 
-	: UI(), ClientWidth(width), ClientHeight(height)
+	: UI(), clientWidth(width), clientHeight(height)
 {
 	TwInit(TW_OPENGL_CORE, nullptr);
 	TwWindowSize(width, height);
@@ -50,7 +51,7 @@ void TweakBarUI::TranslateKeyEvent(int key, int action)
 	if(action == GLFW_REPEAT) tw_action = GLFW_PRESS;
 	else tw_action = action;
 
-	if(Active)
+	if(active)
 		TwEventKeyGLFW(tw_key, tw_action);
 }
 
@@ -76,19 +77,6 @@ void TweakBarUI::UnicodeCharCallback(GLFWwindow* window, unsigned int character)
 {
 	if(System::Instance()->UI->IsActive())
 		TwEventCharGLFW(character, GLFW_PRESS);
-}
-
-void TweakBarUI::ParseName(const std::string& name, std::string& varname, std::string& vargrp) const
-{
-	size_t separator = name.find_first_of('/', 0);
-	if(separator == std::string::npos) {
-		varname = name;
-		vargrp  = std::string();
-	}
-	else {
-		varname = name.substr(separator+1);
-		vargrp  = name.substr(0, separator);
-	}
 }
 
 void TweakBarUI::PlaceBar(TwBar* bar, const int maxIndex)
@@ -132,14 +120,14 @@ void TweakBarUI::PlaceBar(TwBar* bar, const int maxIndex)
 		switch(Placement) {
 		case PlacementMode::Horizontal:
 			info.position[0] += otherInfo.size[0] + Padding;
-			if(info.position[0] + info.size[0] > ClientWidth) {
+			if(info.position[0] + info.size[0] > clientWidth) {
 				info.position[0]  = Padding;
 				info.position[1] += stepSize + Padding;
 			}
 			break;
 		case PlacementMode::Vertical:
 			info.position[1] += otherInfo.size[1] + Padding;
-			if(info.position[1] + info.size[1] > ClientHeight) {
+			if(info.position[1] + info.size[1] > clientHeight) {
 				info.position[0] += stepSize + Padding;
 				info.position[1]  = Padding;
 			}
@@ -159,23 +147,31 @@ TwBar* TweakBarUI::AddBar(const std::string& name)
 	return bar;
 }
 
-void TweakBarUI::AddVariable(TwBar* bar, const std::string& name, TwType type, void* data)
+void TweakBarUI::RemoveBar(TwBar* bar)
 {
-	AddVariable(bar, name, type, data, std::string());
+	TwDeleteBar(bar);
 }
 
-void TweakBarUI::AddVariable(TwBar* bar, const std::string& name, TwType type, void* data, const std::string& def)
+void TweakBarUI::AddVariable(TwBar* bar, const Identifier& ident, TwType type, void* data)
+{
+	AddVariable(bar, ident, type, data, std::string());
+}
+
+void TweakBarUI::AddVariable(TwBar* bar, const Identifier& ident, TwType type, void* data, const std::string& def)
 {
 	std::stringstream buffer;
 	buffer << def << " ";
 
-	std::string varname, vargrp;
-	ParseName(name, varname, vargrp);
-
-	if(!vargrp.empty()) {
-		buffer << "group='" << vargrp << "'";
+	if(!ident.group.empty()) {
+		buffer << "group='" << ident.group << "'";
 	}
-	TwAddVarRW(bar, varname.c_str(), type, data, buffer.str().c_str());
+	TwAddVarRW(bar, ident.name.c_str(), type, data, buffer.str().c_str());
+}
+
+bool TweakBarUI::RemoveVariable(TwBar* bar, const Identifier& ident)
+{
+	TwRemoveVar(bar, ident.name.c_str());
+	return true;
 }
 
 void TweakBarUI::AddSeparator(TwBar* bar, const std::string& name)
@@ -188,13 +184,21 @@ void TweakBarUI::AddSeparator(TwBar* bar, const std::string& name, const std::st
 	std::stringstream buffer;
 	buffer << def << " ";
 
-	std::string varname, vargrp;
-	ParseName(name, varname, vargrp);
-
-	if(!vargrp.empty()) {
-		buffer << "group='" << vargrp << "'";
+	Identifier ident(name);
+	if(!ident.group.empty()) {
+		buffer << "group='" << ident.group << "'";
 	}
-	TwAddSeparator(bar, varname.c_str(), buffer.str().c_str());
+	TwAddSeparator(bar, ident.name.c_str(), buffer.str().c_str());
+}
+
+void TweakBarUI::RefreshBar(TwBar* bar)
+{
+	TwRefreshBar(bar);
+}
+
+TwBar* TweakBarUI::GetBar(const std::string& name)
+{
+	return TwGetBarByName(name.c_str());
 }
 
 void TweakBarUI::Clear()
@@ -204,7 +208,7 @@ void TweakBarUI::Clear()
 
 void TweakBarUI::Draw()
 {
-	if(Active)
+	if(active)
 		TwDraw();
 }
 
