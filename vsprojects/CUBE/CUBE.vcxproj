@@ -89,6 +89,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\core\config.cpp" />
     <ClCompile Include="..\..\src\core\system.cpp" />
     <ClCompile Include="..\..\src\core\ui.cpp" />
     <ClCompile Include="..\..\src\demos\test.cpp" />
@@ -101,6 +102,7 @@
     <ClCompile Include="..\..\src\utils\parameter.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\src\core\config.h" />
     <ClInclude Include="..\..\src\core\declarative.h" />
     <ClInclude Include="..\..\src\core\demo.h" />
     <ClInclude Include="..\..\src\core\system.h" />

@@ -16,6 +16,8 @@ public:
 	Identifier();
 	Identifier(const std::string& name);
 	Identifier(const std::string& name, const Identifier& ident);
+
+	std::string ToString() const;
 };
 
 class Parameter
@@ -83,9 +85,15 @@ public:
 
 	virtual ~Parameter();
 
-	Type GetType() const { return valueType; }
-	const Identifier& GetIdent() const { return valueIdent; }
+	Type GetType() const                   { return valueType; }
+	const Identifier& GetIdent() const     { return valueIdent; }
 	template<typename T> T* GetPtr() const { return (T*)valuePtr; }
+
+	template<typename T> T& GetRef()                  { return *(T*)valuePtr; }
+	template<typename T> const T& GetRefConst() const { return *(T*)valuePtr; }
+
+	std::string ToString() const;
+	bool FromString(const std::string& data);
 };
 
 typedef Parameter Param;

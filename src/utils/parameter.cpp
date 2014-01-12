@@ -41,6 +41,18 @@ Identifier::Identifier(const std::string& name)
 	}
 }
 
+std::string Identifier::ToString() const
+{
+	std::stringstream s;
+	if(!category.empty())
+		s << category << ":";
+	if(!group.empty())
+		s << group << "/";
+	s << name;
+
+	return s.str();
+}
+
 Parameter::~Parameter()
 {
 	if(bar) {
@@ -138,3 +150,67 @@ TwType Parameter::GetUIType(Type type)
 	}
 }
 
+std::string Parameter::ToString() const
+{
+	std::ostringstream s;
+
+	if(valueType == Type::Bool)
+		s << GetRefConst<bool>()?"1":"0";
+	else if(valueType == Type::Int)
+		s << GetRefConst<int>();
+	else if(valueType == Type::Float)
+		s << GetRefConst<float>();
+	else if(valueType == Type::Double)
+		s << GetRefConst<double>();
+	else if(valueType == Type::String)
+		s << GetRefConst<std::string>();
+	else if(valueType == Type::Vec2) {
+		const vec2& v = GetRefConst<vec2>();
+		s << v.x << "," << v.y;
+	}
+	else if(valueType == Type::Vec3 || valueType == Type::Color3 || valueType == Type::Direction) {
+		const vec3& v = GetRefConst<vec3>();
+		s << v.x << "," << v.y << "," << v.z;
+	}
+	else if(valueType == Type::Vec4 || valueType == Type::Color4) {
+		const vec4& v = GetRefConst<vec4>();
+		s << v.x << "," << v.y << "," << v.z << "," << v.w;
+	}
+	else
+		throw std::runtime_error("Invalid parameter type!");
+
+	return s.str();
+}
+
+bool Parameter::FromString(const std::string& data)
+{
+	std::istringstream s(data);
+	auto sep = [](std::istringstream& s) { if(s.peek() == ',') s.ignore(); };
+	
+	if(valueType == Type::Bool)
+		GetRef<bool>() = (data == "1");
+	else if(valueType == Type::Int)
+		s >> GetRef<int>();
+	else if(valueType == Type::Float)
+		s >> GetRef<float>();
+	else if(valueType == Type::Double)
+		s >> GetRef<double>();
+	else if(valueType == Type::String)
+		s >> GetRef<std::string>();
+	else if(valueType == Type::Vec2) {
+		vec2& v = GetRef<vec2>();
+		s >> v.x; sep(s); s >> v.y;
+	}
+	else if(valueType == Type::Vec3 || valueType == Type::Color3 || valueType == Type::Direction) {
+		vec3& v = GetRef<vec3>();
+		s >> v.x; sep(s); s >> v.y; sep(s); s >> v.z;
+	}
+	else if(valueType == Type::Vec4 || valueType == Type::Color4) {
+		vec4& v = GetRef<vec4>();
+		s >> v.x; sep(s); s >> v.y; sep(s); s >> v.z; sep(s); s >> v.w;
+	}
+	else
+		return false;
+
+	return true;
+}
