@@ -4,6 +4,7 @@
 
 namespace CUBE {
 
+enum class PlacementMode;
 typedef std::function<bool (float)> RenderBlock;
 
 namespace Core {
@@ -44,7 +45,7 @@ public:
 
 	 void  TogglePlayback();
 	 void  ToggleUI();
-	 void  ArrangeUI();
+	 void  ArrangeUI(PlacementMode placement);
 
 	 void  Run(RenderBlock render);
 };

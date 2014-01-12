@@ -10,9 +10,8 @@
 
 // Commands
 #define commit System->Run(RenderFunction)
-#define param(type, var, group, ...) Parameter _param_##var(var, Parameter::type, group"/"#var, Parameter::Default, ##__VA_ARGS__)
 
-// Group names
-#define g_none   ""
-#define g_global "Global"
-#define g_scene  "Scene"
+// Parameter definitions
+#define param(type, var, ...)                Parameter _param_##var(var, Parameter::type, #var, Parameter::Default, ##__VA_ARGS__)
+#define gparam(type, var, group, ...)        Parameter _param_##var(var, Parameter::type, #group"/"#var, Parameter::Default, ##__VA_ARGS__)
+#define xparam(type, var, group, flags, ...) Parameter _param_##var(var, Parameter::type, #group"/"#var, flags, ##__VA_ARGS__)

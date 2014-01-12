@@ -28,6 +28,9 @@ Core::System* System::Instance()
 void System::KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
 	if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+#ifdef _DEBUG
+		if(mods & GLFW_MOD_SHIFT)
+#endif
 		glfwSetWindowShouldClose(window, GL_TRUE);
 		return;
 	}
@@ -38,7 +41,10 @@ void System::KeyCallback(GLFWwindow* window, int key, int scancode, int action, 
 		if(action == GLFW_PRESS) System::Instance()->ToggleUI();
 		return;
 	case GLFW_KEY_F2:
-		if(action == GLFW_PRESS) System::Instance()->ArrangeUI();
+		if(action == GLFW_PRESS) System::Instance()->ArrangeUI(PlacementMode::Horizontal);
+		return;
+	case GLFW_KEY_F3:
+		if(action == GLFW_PRESS) System::Instance()->ArrangeUI(PlacementMode::Vertical);
 		return;
 	case GLFW_KEY_SPACE:
 		if(action == GLFW_PRESS) System::Instance()->TogglePlayback();
@@ -241,10 +247,12 @@ void System::ToggleUI()
 	UI->Toggle();
 }
 
-void System::ArrangeUI()
+void System::ArrangeUI(PlacementMode placement)
 {
-	if(UI->IsActive())
+	if(UI->IsActive()) {
+		UI->Placement = placement;
 		UI->Arrange();
+	}
 }
 
 void System::Seek(const float delta)
