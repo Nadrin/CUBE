@@ -2,6 +2,7 @@
 
 #include <stdafx.h>
 #include <core/system.h>
+#include <core/config.h>
 #include <core/ui.h>
 #include <utils/parameter.h>
 
@@ -55,6 +56,8 @@ std::string Identifier::ToString() const
 
 Parameter::~Parameter()
 {
+	Config->Unregister(this);
+
 	if(bar) {
 		if(valueType == Type::Vec2 || valueType == Type::Vec3 || valueType == Type::Vec4) {
 			UI->RemoveVariable(bar, Identifier(valueIdent.name+".X", valueIdent));
@@ -95,6 +98,9 @@ void Parameter::Init(const std::string& path, const std::string& def, Flags flag
 {
 	valueIdent = Identifier(path);
 	TwType uiType = GetUIType(valueType);
+
+	if(!(flags & Flags::Transient))
+		Config->Register(this);
 
 	if(flags & Flags::Hidden || uiType == TW_TYPE_UNDEF) {
 		bar = nullptr;

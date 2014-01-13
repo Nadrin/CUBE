@@ -9,6 +9,9 @@ typedef std::function<bool (float)> RenderBlock;
 
 namespace Core {
 
+class UI;
+class Config;
+
 class System
 {
 private:
@@ -53,6 +56,7 @@ public:
 } // Global
 
 extern class Core::System* System;
+extern class Core::Config* Config;
 extern class Core::UI*     UI;
 
 } // CUBE

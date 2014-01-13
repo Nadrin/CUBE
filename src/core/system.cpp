@@ -2,6 +2,7 @@
 
 #include <stdafx.h>
 #include <core/system.h>
+#include <core/config.h>
 #include <core/ui.h>
 
 #include <cstdio>
@@ -10,6 +11,7 @@
 using namespace CUBE;
 
 class Core::System* CUBE::System = nullptr;
+class Core::Config* CUBE::Config = nullptr;
 class Core::UI*     CUBE::UI     = nullptr;
 
 using namespace CUBE::Core;
@@ -49,6 +51,12 @@ void System::KeyCallback(GLFWwindow* window, int key, int scancode, int action, 
 	case GLFW_KEY_SPACE:
 		if(action == GLFW_PRESS) System::Instance()->TogglePlayback();
 		return;
+	case GLFW_KEY_S:
+		if(mods & GLFW_MOD_CONTROL && action == GLFW_PRESS) {
+			CUBE::Config->Write();
+			return;
+		}
+		break;
 	case GLFW_KEY_LEFT:
 		if(mods & GLFW_MOD_CONTROL) {
 			if(action == GLFW_PRESS || action == GLFW_REPEAT) System::Instance()->Seek(-0.5f);
@@ -89,6 +97,9 @@ void System::Init()
 #ifdef _DEBUG
 	AllocConsole();
 	SetConsoleTitleA("Debug Console");
+	CUBE::Config = new ConfigRW();
+#else
+	CUBE::Config = new Config();
 #endif
 
 	if(!glfwInit()) {
@@ -111,16 +122,15 @@ void System::Terminate()
 	BASS_Stop();
 	BASS_Free();
 
-	delete System::UI;
+	delete CUBE::UI;
+	delete CUBE::Config;
+
 	glfwTerminate();
 	System::Log("CUBE demo toolkit terminated.\n");
 
 #ifdef _DEBUG
 	FreeConsole();
 #endif
-
-	CUBE::UI     = nullptr;
-	CUBE::System = nullptr;
 }
 
 void System::UseOpenGL(const int major, const int minor)

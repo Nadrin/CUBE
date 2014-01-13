@@ -8,6 +8,7 @@
 #include <exception>
 #include <string>
 #include <sstream>
+#include <fstream>
 #include <queue>
 #include <map>
 #include <functional>

@@ -62,9 +62,6 @@
     <ClInclude Include="..\..\src\stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\core\shader.h">
-      <Filter>Header Files\core</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\utils\notify.h">
       <Filter>Header Files\utils</Filter>
     </ClInclude>
