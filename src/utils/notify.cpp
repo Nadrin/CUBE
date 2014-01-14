@@ -11,7 +11,7 @@ FileNotify::FileNotify(const std::string& path, unsigned long delay) : eventDela
 {
 	char buffer[MAX_PATH];
 	GetCurrentDirectoryA(MAX_PATH, buffer);
-	basePath = std::string(buffer) + path + "\\";
+	basePath = std::string(buffer) + "\\" + path + "\\";
 
 	hEventHandle   = CreateEvent(NULL, TRUE, FALSE, NULL);
 	eventTimestamp = 0; // Not technically correct but good enough.
@@ -28,6 +28,8 @@ FileNotify::FileNotify(const std::string& path, unsigned long delay) : eventDela
 		CloseHandle(hEventHandle);
 		throw std::runtime_error("FileNotify: RegisterWaitForSingleObject failed.");
 	}
+
+	Core::System::Instance()->Log("Registered file change notification handler for: %s\n", path.c_str());
 }
 
 FileNotify::~FileNotify()
@@ -97,7 +99,7 @@ void FileNotify::ProcessEvents()
 	for(auto it=fileMap.begin(); it!=fileMap.end(); ++it) {
 		FILETIME timestamp = GetFileModificationTime(it->first);
 		if(CompareFileTime(&timestamp, &processTimestamp) == 1)
-			it->second->operator()();
+			it->second->operator()(it->first);
 	}
 
 	GetSystemTimeAsFileTime(&processTimestamp);

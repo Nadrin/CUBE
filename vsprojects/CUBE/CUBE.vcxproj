@@ -89,6 +89,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\classes\shader.cpp" />
     <ClCompile Include="..\..\src\core\config.cpp" />
     <ClCompile Include="..\..\src\core\system.cpp" />
     <ClCompile Include="..\..\src\core\ui.cpp" />
@@ -102,6 +103,7 @@
     <ClCompile Include="..\..\src\utils\parameter.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\src\classes\shader.h" />
     <ClInclude Include="..\..\src\core\config.h" />
     <ClInclude Include="..\..\src\core\declarative.h" />
     <ClInclude Include="..\..\src\core\demo.h" />

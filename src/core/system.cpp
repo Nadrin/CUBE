@@ -5,6 +5,8 @@
 #include <core/config.h>
 #include <core/ui.h>
 
+#include <utils/notify.h>
+
 #include <cstdio>
 #include <cstdarg>
 
@@ -16,7 +18,8 @@ class Core::UI*     CUBE::UI     = nullptr;
 
 using namespace CUBE::Core;
 
-System::System() : UI(nullptr), paused(false), window(NULL), stream(NULL)
+System::System()
+	: UI(nullptr), ShaderNotify(nullptr), paused(false), window(NULL), stream(NULL)
 {
 	strcpy_s<100>(name, "CUBE");
 }
@@ -122,6 +125,7 @@ void System::Terminate()
 	BASS_Stop();
 	BASS_Free();
 
+	delete ShaderNotify;
 	delete CUBE::UI;
 	delete CUBE::Config;
 
@@ -172,15 +176,17 @@ void System::OpenDisplay(const int width, const int height, bool fullscreen)
 	glewExperimental = GL_TRUE;
 	glewInit();
 
+	System::Log("Opened display: OpenGL %s (%dx%d)\n", glGetString(GL_VERSION), width, height);
+	System::Log("Renderer: %s %s\n", glGetString(GL_VENDOR), glGetString(GL_RENDERER));
+
 #ifdef _DEBUG
 	System::UI = new Core::TweakBarUI(window, width, height);
+	System::Log("Debug GUI initialized.\n");
 #else
 	System::UI = new Core::NullUI();
 #endif
-	CUBE::UI = System::UI;
 
-	System::Log("Opened display: OpenGL %s (%dx%d)\n", glGetString(GL_VERSION), width, height);
-	System::Log("Renderer: %s %s\n", glGetString(GL_VENDOR), glGetString(GL_RENDERER));
+	CUBE::UI = System::UI;
 }
 
 void System::SetName(const char* name)
@@ -270,4 +276,11 @@ void System::Seek(const float delta)
 	double position = BASS_ChannelBytes2Seconds(stream, BASS_ChannelGetPosition(stream, BASS_POS_BYTE));
 	position += double(delta);
 	BASS_ChannelSetPosition(stream, BASS_ChannelSeconds2Bytes(stream, position), BASS_POS_BYTE);
+}
+
+void System::ShaderDirectory(const std::string& path)
+{
+#ifdef _DEBUG
+	ShaderNotify = new FileNotify(path);
+#endif
 }

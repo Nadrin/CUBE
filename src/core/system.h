@@ -4,7 +4,9 @@
 
 namespace CUBE {
 
+class FileNotify;
 enum class PlacementMode;
+
 typedef std::function<bool (float)> RenderBlock;
 
 namespace Core {
@@ -26,6 +28,7 @@ private:
 	 static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 public:
 	 static System* Instance();
+	 class  FileNotify* ShaderNotify;
 	 class  UI* UI;
 public:
 	 void Init();
@@ -49,6 +52,8 @@ public:
 	 void  TogglePlayback();
 	 void  ToggleUI();
 	 void  ArrangeUI(PlacementMode placement);
+
+	 void  ShaderDirectory(const std::string& path);
 
 	 void  Run(RenderBlock render);
 };

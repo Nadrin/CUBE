@@ -25,6 +25,12 @@
     <Filter Include="Source Files\utils">
       <UniqueIdentifier>{7a59c58a-39c9-4de3-ab96-da586fa6bd68}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\classes">
+      <UniqueIdentifier>{5fc75b5a-06cd-4636-9da8-650b2331e572}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\classes">
+      <UniqueIdentifier>{c752d582-4b29-45b6-b379-91b5e8e4ac94}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Header Files\demos">
       <UniqueIdentifier>{4e031c94-b622-4d9a-83fc-f3f45228bf91}</UniqueIdentifier>
     </Filter>
@@ -57,6 +63,9 @@
     <ClCompile Include="..\..\src\core\config.cpp">
       <Filter>Source Files\core</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\classes\shader.cpp">
+      <Filter>Source Files\classes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\stdafx.h">
@@ -88,6 +97,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\core\config.h">
       <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\classes\shader.h">
+      <Filter>Header Files\classes</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

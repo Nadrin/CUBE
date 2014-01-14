@@ -22,7 +22,7 @@ public:
 protected:
 	bool active;
 
-	UI() : active(false), Padding(10), Placement(PlacementMode::None) {}
+	UI() : active(false), Padding(10), Placement(PlacementMode::Horizontal) {}
 public:
 	virtual ~UI() {}
 

@@ -8,7 +8,7 @@ class FileNotify
 {
 public:
 	struct Handler {
-		virtual void operator()() = 0;
+		virtual void operator()(const std::string& filename) = 0;
 	};
 protected:
 	HANDLE hNotifyHandle;
