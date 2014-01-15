@@ -19,7 +19,7 @@ class Core::UI*     CUBE::UI     = nullptr;
 using namespace CUBE::Core;
 
 System::System()
-	: UI(nullptr), ShaderNotify(nullptr), paused(false), window(NULL), stream(NULL)
+	: UI(nullptr), NotifyService(nullptr), paused(false), window(NULL), stream(NULL)
 {
 	strcpy_s<100>(name, "CUBE");
 }
@@ -125,7 +125,7 @@ void System::Terminate()
 	BASS_Stop();
 	BASS_Free();
 
-	delete ShaderNotify;
+	delete NotifyService;
 	delete CUBE::UI;
 	delete CUBE::Config;
 
@@ -209,6 +209,8 @@ void System::Run(RenderBlock render)
 
 #ifdef _DEBUG
 		System::UpdateDebugInfo();
+		if(NotifyService)
+			NotifyService->ProcessEvents();
 #endif
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -278,11 +280,20 @@ void System::Seek(const float delta)
 	BASS_ChannelSetPosition(stream, BASS_ChannelSeconds2Bytes(stream, position), BASS_POS_BYTE);
 }
 
-void System::ShaderDirectory(const std::string& path)
+bool System::SetContentDirectory(const std::string& path)
 {
 #ifdef _DEBUG
-	ShaderNotify = new FileNotify(path);
+	if(NotifyService)
+		return false;
+	NotifyService = new FileNotify(path);
 #endif
+	contentDirectory = path;
+	return true;
+}
+
+const std::string& System::GetContentDirectory() const
+{
+	return contentDirectory;
 }
 
 void System::HandleException(const std::exception& e)

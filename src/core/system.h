@@ -22,13 +22,15 @@ private:
 	 GLFWwindow* window;
 	 HSTREAM     stream;
 
+	 std::string contentDirectory;
+
 	 System();
 private:
 	 void UpdateDebugInfo();
 	 static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 public:
 	 static System* Instance();
-	 class  FileNotify* ShaderNotify;
+	 class  FileNotify* NotifyService;
 	 class  UI* UI;
 public:
 	 void Init();
@@ -53,9 +55,10 @@ public:
 	 void  ToggleUI();
 	 void  ArrangeUI(PlacementMode placement);
 
-	 void  ShaderDirectory(const std::string& path);
-
 	 void  Run(RenderBlock render);
+
+	 bool SetContentDirectory(const std::string& path);
+	 const std::string& GetContentDirectory() const;
 
 	 static void HandleException(const std::exception& e);
 };

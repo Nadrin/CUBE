@@ -12,6 +12,7 @@
 #include <queue>
 #include <map>
 #include <algorithm>
+#include <memory>
 #include <functional>
 
 #define WIN32_LEAN_AND_MEAN

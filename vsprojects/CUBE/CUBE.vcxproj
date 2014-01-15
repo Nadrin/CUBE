@@ -66,6 +66,14 @@
       <AdditionalLibraryDirectories>$(SolutionDir)\lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>opengl32.lib;glfw3dll.lib;glew32.lib;bass.lib;AntTweakBar.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>
+      </Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -87,6 +95,14 @@
       <AdditionalDependencies>opengl32.lib;glfw3dll.lib;glew32.lib;bass.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>
+      </Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\classes\shader.cpp" />
@@ -114,6 +130,10 @@
     <ClInclude Include="..\..\src\utils\lock.h" />
     <ClInclude Include="..\..\src\utils\notify.h" />
     <ClInclude Include="..\..\src\utils\parameter.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\root\shaders\simple_fs.glsl" />
+    <None Include="..\..\root\shaders\simple_vs.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

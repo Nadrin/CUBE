@@ -12,7 +12,7 @@ using namespace CUBE;
 std::string Shader::Prefix("shaders\\");
 
 Shader::Shader(const std::string& path) 
-	: notifyHandler(this), path(Prefix+path), vs(0), fs(0), gs(0)
+	: path(Prefix+path), notifyHandler(this), vs(0), fs(0), gs(0)
 {
 	program = glCreateProgram();
 
@@ -45,6 +45,29 @@ std::string Shader::GetShaderFilename(GLenum type) const
 	throw std::runtime_error("GetShaderFilename: Unsupported shader type!");
 }
 
+std::string Shader::GetInfoLog(const GLuint id, GLenum type) const
+{
+	GLsizei infoLogSize;
+
+	if(type == GL_PROGRAM) {
+		glGetProgramiv(id, GL_INFO_LOG_LENGTH, &infoLogSize);
+		if(infoLogSize > 0) {
+			std::unique_ptr<GLchar[]> infoLog(new GLchar[infoLogSize]);
+			glGetProgramInfoLog(id, infoLogSize, NULL, infoLog.get());
+			return std::string(infoLog.get());
+		}
+	}
+	else {
+		glGetShaderiv(id, GL_INFO_LOG_LENGTH, &infoLogSize);
+		if(infoLogSize > 0) {
+			std::unique_ptr<GLchar[]> infoLog(new GLchar[infoLogSize]);
+			glGetShaderInfoLog(id, infoLogSize, NULL, infoLog.get());
+			return std::string(infoLog.get());
+		}
+	}
+	return std::string();
+}
+
 GLuint Shader::CompileShader(GLenum type)
 {
 	const std::string filename = GetShaderFilename(type);
@@ -66,16 +89,9 @@ GLuint Shader::CompileShader(GLenum type)
 	glCompileShader(shader);
 #ifdef _DEBUG
 	{
-		GLchar* infoLog;
-		GLsizei infoLogSize;
-		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLogSize);
-
-		if(infoLogSize > 0) {
-			infoLog = new GLchar[infoLogSize];
-			glGetShaderInfoLog(shader, infoLogSize, NULL, infoLog);
-			Core::System::Instance()->Log("%s\n", infoLog);
-			delete[] infoLog;
-		}
+		std::string infoLog(GetInfoLog(shader, type));
+		if(infoLog.find_first_not_of(" \t\n\r") != std::string::npos)
+			Core::System::Instance()->Log("\n%s\n", infoLog.c_str());
 	}
 #endif
 
@@ -87,20 +103,30 @@ GLuint Shader::CompileShader(GLenum type)
 	}
 
 #ifdef _DEBUG
-	Core::System::Instance()->ShaderNotify->RegisterHandler(filename, &notifyHandler);
+	Core::System::Instance()->NotifyService->RegisterHandler(filename, &notifyHandler);
 #endif
 	return shader;
 }
 
 bool Shader::ReloadShader(GLenum type, GLuint& id)
 {
+	Core::System::Instance()->Log("Received shader reload notification.\n");
+	
+	GLuint newId;
+	try {
+		newId = CompileShader(type);
+		if(!newId)
+			throw std::runtime_error("Cannot read shader source file.");
+	}
+	catch(std::runtime_error& error) {
+		Core::System::Instance()->Log("Reload failed: %s\n", error.what());
+		return false;
+	}
+
 	glDetachShader(program, id);
 	glDeleteShader(id);
 
-	id = CompileShader(type);
-	if(!id)
-		return false;
-
+	id = newId;
 	glAttachShader(program, id);
 	LinkProgram();
 	return true;
@@ -109,7 +135,7 @@ bool Shader::ReloadShader(GLenum type, GLuint& id)
 void Shader::DeleteShader(GLenum type, GLuint& id)
 {
 #ifdef _DEBUG
-	Core::System::Instance()->ShaderNotify->UnregisterHandler(GetShaderFilename(type));
+	Core::System::Instance()->NotifyService->UnregisterHandler(GetShaderFilename(type));
 #endif
 
 	glDetachShader(program, id);
@@ -131,13 +157,10 @@ void Shader::LinkProgram()
 		glGetProgramiv(program, GL_VALIDATE_STATUS, &status);
 	}
 
-	GLsizei infoLogSize;
-	glGetProgramiv(program, GL_INFO_LOG_LENGTH, &infoLogSize);
-	if(infoLogSize > 0) {
-		GLchar* infoLog = new GLchar[infoLogSize];
-		glGetProgramInfoLog(program, infoLogSize, NULL, infoLog);
-		Core::System::Instance()->Log("%s\n", infoLog);
-		delete[] infoLog;
+	{
+		std::string infoLog(GetInfoLog(program, GL_PROGRAM));
+		if(infoLog.find_first_not_of(" \t\n\r") != std::string::npos)
+			Core::System::Instance()->Log("\n%s\n", infoLog.c_str());
 	}
 #endif
 

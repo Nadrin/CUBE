@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <utils/notify.h>
+
 namespace CUBE {
 
 class Shader
@@ -18,6 +20,7 @@ protected:
 	} notifyHandler;
 protected:
 	std::string GetShaderFilename(GLenum type) const;
+	std::string GetInfoLog(const GLuint id, GLenum type) const;
 
 	GLuint CompileShader(GLenum type);
 	bool   ReloadShader(GLenum type, GLuint& id);
@@ -26,6 +29,7 @@ protected:
 	void   DeleteProgram();
 public:
 	Shader(const std::string& path);
+	Shader(const Shader& other) = delete;
 	virtual ~Shader();
 
 	static std::string Prefix;

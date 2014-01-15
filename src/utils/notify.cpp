@@ -29,7 +29,7 @@ FileNotify::FileNotify(const std::string& path, unsigned long delay) : eventDela
 		throw std::runtime_error("FileNotify: RegisterWaitForSingleObject failed.");
 	}
 
-	Core::System::Instance()->Log("Registered file change notification handler for: %s\n", path.c_str());
+	Core::System::Instance()->Log("Registered file notification handler for: %s\n", path.c_str());
 }
 
 FileNotify::~FileNotify()

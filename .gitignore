@@ -12,7 +12,6 @@
 [Rr]elease/
 x64/
 build/
-root/
 [Bb]in/
 [Oo]bj/
 
@@ -150,3 +149,11 @@ $RECYCLE.BIN/
 
 # Mac crap
 .DS_Store
+
+# =========================
+# Assets & binaries
+# =========================
+
+root/*.dll
+root/*.ini
+root/*.mp3
