@@ -12,7 +12,7 @@ using namespace CUBE;
 std::string Shader::Prefix("shaders\\");
 
 Shader::Shader(const std::string& path) 
-	: path(path), vs(0), fs(0), gs(0), program(0)
+	: notifyHandler(this), path(Prefix+path), vs(0), fs(0), gs(0)
 {
 	program = glCreateProgram();
 
@@ -64,6 +64,7 @@ GLuint Shader::CompileShader(GLenum type)
 
 	Core::System::Instance()->Log("Compiling shader: %s ...\n", filename.c_str());
 	glCompileShader(shader);
+#ifdef _DEBUG
 	{
 		GLchar* infoLog;
 		GLsizei infoLogSize;
@@ -76,6 +77,7 @@ GLuint Shader::CompileShader(GLenum type)
 			delete[] infoLog;
 		}
 	}
+#endif
 
 	GLint status;
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
@@ -83,7 +85,36 @@ GLuint Shader::CompileShader(GLenum type)
 		glDeleteShader(shader);
 		throw std::runtime_error("Shader compilation failed.");
 	}
+
+#ifdef _DEBUG
+	Core::System::Instance()->ShaderNotify->RegisterHandler(filename, &notifyHandler);
+#endif
 	return shader;
+}
+
+bool Shader::ReloadShader(GLenum type, GLuint& id)
+{
+	glDetachShader(program, id);
+	glDeleteShader(id);
+
+	id = CompileShader(type);
+	if(!id)
+		return false;
+
+	glAttachShader(program, id);
+	LinkProgram();
+	return true;
+}
+
+void Shader::DeleteShader(GLenum type, GLuint& id)
+{
+#ifdef _DEBUG
+	Core::System::Instance()->ShaderNotify->UnregisterHandler(GetShaderFilename(type));
+#endif
+
+	glDetachShader(program, id);
+	glDeleteShader(id);
+	id = 0;
 }
 
 void Shader::LinkProgram()
@@ -93,6 +124,8 @@ void Shader::LinkProgram()
 
 	GLint status;
 	glGetProgramiv(program, GL_LINK_STATUS, &status);
+
+#ifdef _DEBUG
 	if(GL_TRUE == status) {
 		glValidateProgram(program);
 		glGetProgramiv(program, GL_VALIDATE_STATUS, &status);
@@ -106,6 +139,7 @@ void Shader::LinkProgram()
 		Core::System::Instance()->Log("%s\n", infoLog);
 		delete[] infoLog;
 	}
+#endif
 
 	if(GL_TRUE != status) {
 		DeleteProgram();
@@ -115,12 +149,36 @@ void Shader::LinkProgram()
 
 void Shader::DeleteProgram()
 {
-	if(vs) glDeleteShader(vs); vs=0;
-	if(fs) glDeleteShader(fs); fs=0;
-	if(gs) glDeleteShader(gs); gs=0;
+	if(vs) DeleteShader(GL_VERTEX_SHADER, vs);
+	if(fs) DeleteShader(GL_FRAGMENT_SHADER, fs);
+	if(gs) DeleteShader(GL_GEOMETRY_SHADER, gs);
 
 	glDeleteProgram(program);
 	program=0;
+}
+
+void Shader::NotifyHandler::operator()(const std::string& filename)
+{
+	auto Suffix = [](const std::string& a, const std::string& b) {
+		if(b.size() > a.size()) return false;
+		return std::equal(a.begin() + a.size() - b.size(), a.end(), b.begin());
+	};
+
+	if(Suffix(filename, "_vs.glsl")) {
+		if(shader->vs)
+			shader->ReloadShader(GL_VERTEX_SHADER, shader->vs);
+	}
+	else if(Suffix(filename, "_fs.glsl")) {
+		if(shader->fs)
+			shader->ReloadShader(GL_FRAGMENT_SHADER, shader->fs);
+	}
+	else if(Suffix(filename, "_gs.glsl")) {
+		if(shader->gs)
+			shader->ReloadShader(GL_GEOMETRY_SHADER, shader->gs);
+	}
+	else {
+		Core::System::Instance()->Log("Warning: Received shader reload event for unknown filename: %s\n", filename.c_str());
+	}
 }
 
 UseShader::UseShader(Shader& s) : shader(&s)

@@ -56,6 +56,8 @@ public:
 	 void  ShaderDirectory(const std::string& path);
 
 	 void  Run(RenderBlock render);
+
+	 static void HandleException(const std::exception& e);
 };
 
 } // Global

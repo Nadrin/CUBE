@@ -284,3 +284,17 @@ void System::ShaderDirectory(const std::string& path)
 	ShaderNotify = new FileNotify(path);
 #endif
 }
+
+void System::HandleException(const std::exception& e)
+{
+	std::string message(e.what());
+	try { BASS_Stop(); } catch(const std::exception&) {};
+
+#ifdef _DEBUG
+	message.append("\nDo you want to debug?");
+	if(MessageBoxA(NULL, message.c_str(), "CUBE [Exception]", MB_ICONSTOP | MB_YESNO) == IDYES)
+		throw;
+#else
+	MessageBoxA(NULL, message.c_str(), "CUBE [Exception]", MB_ICONSTOP | MB_OK);
+#endif
+}

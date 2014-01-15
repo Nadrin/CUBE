@@ -10,8 +10,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 {
 	using System = Core::System;
 
-	System::Instance()->Init();
-	Core::Demo::Implementation();
-	System::Instance()->Terminate();
+	try {
+		System::Instance()->Init();
+		Core::Demo::Implementation();
+		System::Instance()->Terminate();
+	}
+	catch(std::exception& e) {
+		System::HandleException(e);
+	}
 	return 0;
 }
