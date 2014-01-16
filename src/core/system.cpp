@@ -187,6 +187,7 @@ void System::OpenDisplay(const int width, const int height, bool fullscreen)
 #endif
 
 	CUBE::UI = System::UI;
+	ClearErrorGL();
 }
 
 void System::SetName(const char* name)
@@ -308,4 +309,29 @@ void System::HandleException(const std::exception& e)
 #else
 	MessageBoxA(NULL, message.c_str(), "CUBE [Exception]", MB_ICONSTOP | MB_OK);
 #endif
+}
+
+void System::ClearErrorGL()
+{
+	while(glGetError() != GL_NO_ERROR);
+}
+
+void System::CheckErrorGL(const char* call, const char* file, const int line)
+{
+	static const std::map<GLenum, std::string> errorString = {
+		{ GL_INVALID_ENUM, "INVALID_ENUM" },
+		{ GL_INVALID_VALUE, "INVALID_VALUE" },
+		{ GL_INVALID_OPERATION, "INVALID_OPERATION" },
+		{ GL_STACK_OVERFLOW, "STACK_OVERFLOW" },
+		{ GL_STACK_UNDERFLOW, "STACK_UNDERFLOW" },
+		{ GL_OUT_OF_MEMORY, "OUT_OF_MEMORY" },
+		{ GL_INVALID_FRAMEBUFFER_OPERATION, "INVALID_FRAMEBUFFER_OPERATION" },
+		{ GL_TABLE_TOO_LARGE, "TABLE_TOO_LARGE" }
+	};
+
+	GLenum error;
+	while((error = glGetError()) != GL_NO_ERROR) {
+		System::Instance()->Log("Error: %s = %02x (%s)\n  at %s:%d\n",
+			call, error, errorString.at(error).c_str(), file, line);
+	}
 }

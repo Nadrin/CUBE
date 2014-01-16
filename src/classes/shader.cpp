@@ -14,15 +14,15 @@ std::string Shader::Prefix("shaders\\");
 Shader::Shader(const std::string& path) 
 	: path(Prefix+path), notifyHandler(this), vs(0), fs(0), gs(0)
 {
-	program = glCreateProgram();
+	program = gltry(glCreateProgram());
 
 	vs = CompileShader(GL_VERTEX_SHADER);
 	fs = CompileShader(GL_FRAGMENT_SHADER);
 	gs = CompileShader(GL_GEOMETRY_SHADER);
 
-	if(vs) glAttachShader(program, vs);
-	if(fs) glAttachShader(program, fs);
-	if(gs) glAttachShader(program, gs);
+	if(vs) gltry(glAttachShader(program, vs));
+	if(fs) gltry(glAttachShader(program, fs));
+	if(gs) gltry(glAttachShader(program, gs));
 
 	LinkProgram();
 }
@@ -50,18 +50,18 @@ std::string Shader::GetInfoLog(const GLuint id, GLenum type) const
 	GLsizei infoLogSize;
 
 	if(type == GL_PROGRAM) {
-		glGetProgramiv(id, GL_INFO_LOG_LENGTH, &infoLogSize);
+		gltry(glGetProgramiv(id, GL_INFO_LOG_LENGTH, &infoLogSize));
 		if(infoLogSize > 0) {
 			std::unique_ptr<GLchar[]> infoLog(new GLchar[infoLogSize]);
-			glGetProgramInfoLog(id, infoLogSize, NULL, infoLog.get());
+			gltry(glGetProgramInfoLog(id, infoLogSize, NULL, infoLog.get()));
 			return std::string(infoLog.get());
 		}
 	}
 	else {
-		glGetShaderiv(id, GL_INFO_LOG_LENGTH, &infoLogSize);
+		gltry(glGetShaderiv(id, GL_INFO_LOG_LENGTH, &infoLogSize));
 		if(infoLogSize > 0) {
 			std::unique_ptr<GLchar[]> infoLog(new GLchar[infoLogSize]);
-			glGetShaderInfoLog(id, infoLogSize, NULL, infoLog.get());
+			gltry(glGetShaderInfoLog(id, infoLogSize, NULL, infoLog.get()));
 			return std::string(infoLog.get());
 		}
 	}
@@ -76,17 +76,17 @@ GLuint Shader::CompileShader(GLenum type)
 	if(!file.is_open())
 		return 0;
 
-	GLuint shader = glCreateShader(type);
+	GLuint shader = gltry(glCreateShader(type));
 	{
 		std::string source((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 		const GLchar* inSource[] = { source.c_str() };
 		const GLint inLength[]   = { source.length() };
 
-		glShaderSource(shader, 1, inSource, inLength);
+		gltry(glShaderSource(shader, 1, inSource, inLength));
 	}
 
 	Core::System::Instance()->Log("Compiling shader: %s ...\n", filename.c_str());
-	glCompileShader(shader);
+	gltry(glCompileShader(shader));
 #ifdef _DEBUG
 	{
 		std::string infoLog(GetInfoLog(shader, type));
@@ -96,9 +96,9 @@ GLuint Shader::CompileShader(GLenum type)
 #endif
 
 	GLint status;
-	glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
+	gltry(glGetShaderiv(shader, GL_COMPILE_STATUS, &status));
 	if(GL_TRUE != status) {
-		glDeleteShader(shader);
+		gltry(glDeleteShader(shader));
 		throw std::runtime_error("Shader compilation failed.");
 	}
 
@@ -123,11 +123,11 @@ bool Shader::ReloadShader(GLenum type, GLuint& id)
 		return false;
 	}
 
-	glDetachShader(program, id);
-	glDeleteShader(id);
+	gltry(glDetachShader(program, id));
+	gltry(glDeleteShader(id));
 
 	id = newId;
-	glAttachShader(program, id);
+	gltry(glAttachShader(program, id));
 	LinkProgram();
 	return true;
 }
@@ -138,23 +138,23 @@ void Shader::DeleteShader(GLenum type, GLuint& id)
 	Core::System::Instance()->NotifyService->UnregisterHandler(GetShaderFilename(type));
 #endif
 
-	glDetachShader(program, id);
-	glDeleteShader(id);
+	gltry(glDetachShader(program, id));
+	gltry(glDeleteShader(id));
 	id = 0;
 }
 
 void Shader::LinkProgram()
 {
 	Core::System::Instance()->Log("Linking shader program: %s ...\n", path.c_str());
-	glLinkProgram(program);
+	gltry(glLinkProgram(program));
 
 	GLint status;
-	glGetProgramiv(program, GL_LINK_STATUS, &status);
+	gltry(glGetProgramiv(program, GL_LINK_STATUS, &status));
 
 #ifdef _DEBUG
 	if(GL_TRUE == status) {
-		glValidateProgram(program);
-		glGetProgramiv(program, GL_VALIDATE_STATUS, &status);
+		gltry(glValidateProgram(program));
+		gltry(glGetProgramiv(program, GL_VALIDATE_STATUS, &status));
 	}
 
 	{
@@ -176,7 +176,7 @@ void Shader::DeleteProgram()
 	if(fs) DeleteShader(GL_FRAGMENT_SHADER, fs);
 	if(gs) DeleteShader(GL_GEOMETRY_SHADER, gs);
 
-	glDeleteProgram(program);
+	gltry(glDeleteProgram(program));
 	program=0;
 }
 
@@ -206,10 +206,10 @@ void Shader::NotifyHandler::operator()(const std::string& filename)
 
 UseShader::UseShader(Shader& s) : shader(&s)
 {
-	glUseProgram(shader->program);
+	gltry(glUseProgram(shader->program));
 }
 
 UseShader::~UseShader()
 {
-	glUseProgram(0);
+	gltry(glUseProgram(0));
 }

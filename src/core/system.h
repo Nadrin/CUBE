@@ -2,6 +2,14 @@
 
 #pragma once
 
+#ifdef _DEBUG
+#define gltry(function_call) \
+	function_call; \
+	CUBE::Core::System::CheckErrorGL(#function_call, __FILE__, __LINE__)
+#else
+#define gltry(function_call) function_call
+#endif
+
 namespace CUBE {
 
 class FileNotify;
@@ -60,6 +68,8 @@ public:
 	 bool SetContentDirectory(const std::string& path);
 	 const std::string& GetContentDirectory() const;
 
+	 static void ClearErrorGL();
+	 static void CheckErrorGL(const char* call, const char* file, const int line);
 	 static void HandleException(const std::exception& e);
 };
 
