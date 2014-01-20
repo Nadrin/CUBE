@@ -22,16 +22,12 @@ protected:
 
 	std::string filename;
 	std::map<std::string, Item> parameterMap;
-protected:
-	void Register(Parameter* param);
-	virtual void Unregister(Parameter* param) {}
 public:
-	virtual ~Config() {}
-
 	bool Read(const std::string& filename);
 	virtual bool Write() { return false; }
 
-	friend class Parameter;
+	bool Register(Parameter* param);
+	virtual void Unregister(Parameter* param) {}
 };
 
 #ifdef _DEBUG
@@ -40,7 +36,6 @@ class ConfigRW : public Config
 protected:
 	virtual void Unregister(Parameter* param);
 public:
-	virtual ~ConfigRW() { Write(); }
 	virtual bool Write();
 };
 #endif

@@ -8,7 +8,7 @@
 using namespace CUBE;
 using namespace CUBE::Core;
 
-void Config::Register(Parameter* param)
+bool Config::Register(Parameter* param)
 {
 	std::string name = param->GetIdent().ToString();
 
@@ -16,9 +16,11 @@ void Config::Register(Parameter* param)
 	if(it != parameterMap.end()) {
 		it->second.param = param;
 		param->FromString(it->second.value);
+		return true;
 	}
 	else {
 		parameterMap[name] = Item(param->ToString(), param);
+		return false;
 	}
 }
 

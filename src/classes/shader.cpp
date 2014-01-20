@@ -12,7 +12,7 @@ using namespace CUBE;
 std::string Shader::Prefix("shaders\\");
 
 Shader::Shader(const std::string& path) 
-	: path(Prefix+path), notifyHandler(this), vs(0), fs(0), gs(0)
+	: name(path), path(Prefix+path), notifyHandler(this), isActive(false), vs(0), fs(0), gs(0)
 {
 	program = gltry(glCreateProgram());
 
@@ -168,10 +168,16 @@ void Shader::LinkProgram()
 		DeleteProgram();
 		throw std::runtime_error("Shader program linking failed.");
 	}
+
+	ValidateUniforms();
+	CreateParameters();
 }
 
 void Shader::DeleteProgram()
 {
+	uniformParameters.remove_if([](ShaderParameter* p) { delete p; return true; });
+	uniformCache.clear();
+
 	if(vs) DeleteShader(GL_VERTEX_SHADER, vs);
 	if(fs) DeleteShader(GL_FRAGMENT_SHADER, fs);
 	if(gs) DeleteShader(GL_GEOMETRY_SHADER, gs);
@@ -204,12 +210,75 @@ void Shader::NotifyHandler::operator()(const std::string& filename)
 	}
 }
 
+Shader::Uniform& Shader::operator[](const std::string& name) const
+{
+	auto it = uniformCache.find(name);
+	if(it != uniformCache.end())
+		return it->second;
+
+	GLint location = gltry(glGetUniformLocation(program, name.c_str()));
+	assert(location != -1);
+
+	return uniformCache.insert({name, Shader::Uniform(this, location)}).first->second;
+}
+
+void Shader::ValidateUniforms()
+{
+	for(auto kv : uniformCache) {
+		GLint location = gltry(glGetUniformLocation(program, kv.first.c_str()));
+		if(location == -1)
+			throw std::runtime_error("Cannot validate shader uniforms.");
+		kv.second.location = location;
+	}
+}
+
+void Shader::CreateParameters()
+{
+	uniformParameters.remove_if([](ShaderParameter* p) { delete p; return true; });
+
+	GLint  count;
+	GLchar namebuf[256];
+	gltry(glGetProgramiv(program, GL_ACTIVE_UNIFORMS, &count));
+
+	for(GLint i=0; i<count; i++) {
+		GLint size;
+		GLenum type;
+		GLsizei namelen;
+		Parameter::Type ptype;
+
+		gltry(glGetActiveUniform(program, i, 256, &namelen, &size, &type, namebuf));
+
+		if(size != 1 || namelen < 3 || namebuf[0] != 'p')
+			continue;
+
+		switch(type) {
+		case GL_INT:   ptype = Parameter::Int; break;
+		case GL_FLOAT: ptype = Parameter::Float; break;
+		case GL_FLOAT_VEC2: ptype = Parameter::Vec2; break;
+		case GL_FLOAT_VEC3: ptype = Parameter::Vec3; break;
+		case GL_FLOAT_VEC4: ptype = Parameter::Vec4; break;
+		default: continue;
+		}
+
+		if(ptype == Parameter::Vec3 && namebuf[1] == 'c')
+			ptype = Parameter::Color3;
+		if(ptype == Parameter::Vec3 && namebuf[1] == 'd')
+			ptype = Parameter::Direction;
+		if(ptype == Parameter::Vec4 && namebuf[1] == 'c')
+			ptype = Parameter::Color4;
+
+		uniformParameters.push_back(new ShaderParameter(this, namebuf, ptype));
+	}
+}
+
 UseShader::UseShader(Shader& s) : shader(&s)
 {
 	gltry(glUseProgram(shader->program));
+	shader->isActive = true;
 }
 
 UseShader::~UseShader()
 {
 	gltry(glUseProgram(0));
+	shader->isActive = false;
 }

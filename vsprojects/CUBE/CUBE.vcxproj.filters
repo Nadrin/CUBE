@@ -107,6 +107,9 @@
     <ClInclude Include="..\..\src\classes\shader.h">
       <Filter>Header Files\classes</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\classes\uniform.inl">
+      <Filter>Header Files\classes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\root\shaders\simple_fs.glsl">

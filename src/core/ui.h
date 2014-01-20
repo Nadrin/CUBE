@@ -33,6 +33,9 @@ public:
 	virtual void   RemoveBar(TwBar* bar) {}
 	virtual void   AddVariable(TwBar* bar, const Identifier& ident, TwType type, void* data) {}
 	virtual void   AddVariable(TwBar* bar, const Identifier& ident, TwType type, void* data, const std::string& def) {}
+	virtual void   AddVariable(TwBar* bar, const Identifier& ident, TwType type, 
+		TwGetVarCallback getCallback, TwSetVarCallback setCallback, void* data, const std::string& def) {}
+
 	virtual bool   RemoveVariable(TwBar* bar, const Identifier& ident) { return true; }
 	virtual void   AddSeparator(TwBar* bar, const std::string& name) {}
 	virtual void   AddSeparator(TwBar* bar, const std::string& name, const std::string& def) {}
@@ -73,6 +76,9 @@ public:
 	virtual void   RemoveBar(TwBar* bar) override;
 	virtual void   AddVariable(TwBar* bar, const Identifier& ident, TwType type, void* data) override;
 	virtual void   AddVariable(TwBar* bar, const Identifier& ident, TwType type, void* data, const std::string& def) override;
+	virtual void   AddVariable(TwBar* bar, const Identifier& ident, TwType type, 
+		TwGetVarCallback getCallback, TwSetVarCallback setCallback, void* data, const std::string& def) override;
+
 	virtual bool   RemoveVariable(TwBar* bar, const Identifier& ident) override;
 	virtual void   AddSeparator(TwBar* bar, const std::string& name) override;
 	virtual void   AddSeparator(TwBar* bar, const std::string& name, const std::string& def) override;

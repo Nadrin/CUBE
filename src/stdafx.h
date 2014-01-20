@@ -10,6 +10,8 @@
 #include <sstream>
 #include <fstream>
 #include <queue>
+#include <vector>
+#include <list>
 #include <map>
 #include <algorithm>
 #include <memory>

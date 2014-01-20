@@ -168,6 +168,18 @@ void TweakBarUI::AddVariable(TwBar* bar, const Identifier& ident, TwType type, v
 	TwAddVarRW(bar, ident.name.c_str(), type, data, buffer.str().c_str());
 }
 
+void TweakBarUI::AddVariable(TwBar* bar, const Identifier& ident, TwType type, 
+		TwGetVarCallback getCallback, TwSetVarCallback setCallback, void* data, const std::string& def)
+{
+	std::stringstream buffer;
+	buffer << def << " ";
+
+	if(!ident.group.empty()) {
+		buffer << "group='" << ident.group << "'";
+	}
+	TwAddVarCB(bar, ident.name.c_str(), type, setCallback, getCallback, data, buffer.str().c_str());
+}
+
 bool TweakBarUI::RemoveVariable(TwBar* bar, const Identifier& ident)
 {
 	TwRemoveVar(bar, ident.name.c_str());

@@ -27,6 +27,7 @@ void TestDemo::Main()
 	Config->Read("demo.ini");
 
 	Shader simpleShader("simple");
+	simpleShader["test"] = vec4(0.5f);
 
 	render {
 		glClear(GL_COLOR_BUFFER_BIT);

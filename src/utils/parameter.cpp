@@ -56,7 +56,9 @@ std::string Identifier::ToString() const
 
 Parameter::~Parameter()
 {
-	Config->Unregister(this);
+	if(valuePtr) {
+		Config->Unregister(this);
+	}
 
 	if(bar) {
 		if(valueType == Type::Vec2 || valueType == Type::Vec3 || valueType == Type::Vec4) {
@@ -219,4 +221,140 @@ bool Parameter::FromString(const std::string& data)
 		return false;
 
 	return true;
+}
+
+ShaderParameter::ShaderParameter(const Shader* shader, const std::string& name, Type type)
+{
+	switch(type) {
+	case Type::Int:
+		valuePtr = new int(); break;
+	case Type::Float:
+		valuePtr = new float(); break;
+	case Type::Vec2:
+		valuePtr = new vec2(); break;
+	case Type::Vec3:
+	case Type::Color3:
+	case Type::Direction:
+		valuePtr = new vec3(); break;
+	case Type::Vec4:
+	case Type::Color4:
+		valuePtr = new vec4(); break;
+	default:
+		assert(false);
+	}
+
+	valueType = type;
+	uniform   = &shader->operator[](name);
+
+	context[0] = { this, CallbackContext::Component::X };
+	context[1] = { this, CallbackContext::Component::Y };
+	context[2] = { this, CallbackContext::Component::Z };
+	context[3] = { this, CallbackContext::Component::W };
+
+	ShaderParameter::Init("Shaders:" + shader->getName() + "/" + name, "");
+}
+
+ShaderParameter::~ShaderParameter()
+{
+	Config->Unregister(this);
+	delete valuePtr;
+	valuePtr = nullptr;
+}
+
+void ShaderParameter::Init(const std::string& path, const std::string& def)
+{
+	valueIdent = Identifier(path);
+	TwType uiType = GetUIType(valueType);
+
+	if(Config->Register(this))
+		Update();
+
+	bar = UI->GetBar(valueIdent.category);
+	if(!bar) {
+		bar = UI->AddBar(valueIdent.category);
+	}
+
+	if(valueType == Type::Vec2 || valueType == Type::Vec3 || valueType == Type::Vec4) {
+		UI->AddVariable(bar, Identifier(valueIdent.name+".X", valueIdent), uiType, GetCallback, SetCallback, &context[0], def);
+		UI->AddVariable(bar, Identifier(valueIdent.name+".Y", valueIdent), uiType, GetCallback, SetCallback, &context[1], def);
+
+		if(valueType == Type::Vec3 || valueType == Type::Vec4) {
+			UI->AddVariable(bar, Identifier(valueIdent.name+".Z", valueIdent), uiType, GetCallback, SetCallback, &context[2], def);
+		}
+		if(valueType == Type::Vec4) {
+			UI->AddVariable(bar, Identifier(valueIdent.name+".W", valueIdent), uiType, GetCallback, SetCallback, &context[3], def);
+		}
+	}
+	else {
+		UI->AddVariable(bar, valueIdent, uiType, GetCallback, SetCallback, &context[0], def);
+	}
+}
+
+void ShaderParameter::Update()
+{
+	switch(valueType) {
+	case Type::Int:
+		uniform->operator=(GetRefConst<int>()); break;
+	case Type::Float:
+		uniform->operator=(GetRefConst<float>()); break;
+	case Type::Vec2:
+		uniform->operator=(GetRefConst<vec2>()); break;
+	case Type::Vec3:
+	case Type::Color3:
+	case Type::Direction:
+		uniform->operator=(GetRefConst<vec3>()); break;
+	case Type::Vec4:
+	case Type::Color4:
+		uniform->operator=(GetRefConst<vec4>()); break;
+	default:
+		assert(false);
+	}
+}
+
+void TW_CALL ShaderParameter::GetCallback(void* value, void* clientData)
+{
+	ShaderParameter::CallbackContext* ctx = static_cast<ShaderParameter::CallbackContext*>(clientData);
+	const int component = static_cast<const int>(ctx->component);
+
+	switch(ctx->sp->valueType) {
+	case Type::Int:
+		std::memcpy(value, ctx->sp->valuePtr, sizeof(int)); break;
+	case Type::Float:
+	case Type::Vec2:
+	case Type::Vec3:
+	case Type::Vec4:
+		std::memcpy(value, static_cast<const float*>(ctx->sp->valuePtr) + component, sizeof(float)); break;
+	case Type::Color3:
+	case Type::Direction:
+		std::memcpy(value, ctx->sp->valuePtr, 3*sizeof(float)); break;
+	case Type::Color4:
+		std::memcpy(value, ctx->sp->valuePtr, 4*sizeof(float)); break;
+	default:
+		assert(false);
+	}
+}
+
+void TW_CALL ShaderParameter::SetCallback(const void* value, void* clientData)
+{
+	ShaderParameter::CallbackContext* ctx = static_cast<ShaderParameter::CallbackContext*>(clientData);
+	const int component = static_cast<const int>(ctx->component);
+
+	switch(ctx->sp->valueType) {
+	case Type::Int:
+		std::memcpy(ctx->sp->valuePtr, value, sizeof(int)); break;
+	case Type::Float:
+	case Type::Vec2:
+	case Type::Vec3:
+	case Type::Vec4:
+		std::memcpy(static_cast<float*>(ctx->sp->valuePtr) + component, value, sizeof(float)); break;
+	case Type::Color3:
+	case Type::Direction:
+		std::memcpy(ctx->sp->valuePtr, value, 3*sizeof(float)); break;
+	case Type::Color4:
+		std::memcpy(ctx->sp->valuePtr, value, 4*sizeof(float)); break;
+	default:
+		assert(false);
+	}
+
+	ctx->sp->Update();
 }

@@ -8,10 +8,18 @@ namespace CUBE {
 
 class Shader
 {
+public:
+	#include "uniform.inl"
 protected:
 	GLuint vs, fs, gs;
 	GLuint program;
+
 	std::string path;
+	std::string name;
+	mutable bool isActive;
+
+	std::list<class ShaderParameter*> uniformParameters;
+	mutable std::map<std::string, Uniform> uniformCache;
 
 	struct NotifyHandler : public FileNotify::Handler {
 		Shader* shader;
@@ -27,10 +35,17 @@ protected:
 	void   DeleteShader(GLenum type, GLuint& id);
 	void   LinkProgram();
 	void   DeleteProgram();
+	void   ValidateUniforms();
+	void   CreateParameters();
 public:
 	Shader(const std::string& path);
 	Shader(const Shader& other) = delete;
 	virtual ~Shader();
+
+	const std::string& getPath() const { return path; }
+	const std::string& getName() const { return name; }
+
+	Uniform& operator[](const std::string& name) const;
 
 	static std::string Prefix;
 
@@ -46,7 +61,14 @@ public:
 	UseShader(Shader& s);
 	~UseShader();
 
-	Shader& operator->() const { return *shader; }
+	Shader::Uniform& operator[](const std::string& name) const
+	{
+		return shader->operator[](name);
+	}
+	Shader* operator->() const
+	{ 
+		return shader;
+	}
 };
 
 } // CUBE

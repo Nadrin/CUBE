@@ -120,6 +120,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\classes\shader.h" />
+    <ClInclude Include="..\..\src\classes\uniform.inl" />
     <ClInclude Include="..\..\src\core\config.h" />
     <ClInclude Include="..\..\src\core\declarative.h" />
     <ClInclude Include="..\..\src\core\demo.h" />
