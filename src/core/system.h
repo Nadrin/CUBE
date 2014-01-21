@@ -29,8 +29,11 @@ private:
 	 bool        paused;
 	 GLFWwindow* window;
 	 HSTREAM     stream;
-
 	 std::string contentDirectory;
+
+	 mutable struct {
+		std::string SceneName;
+	 } DebugInfo;
 
 	 System();
 private:
@@ -65,10 +68,12 @@ public:
 	 void  ToggleUI();
 	 void  ArrangeUI(PlacementMode placement);
 
-	 void  Run(RenderBlock render);
+	 void  Run(RenderBlock renderFunction);
 
 	 bool SetContentDirectory(const std::string& path);
 	 const std::string& GetContentDirectory() const;
+
+	 void Debug_SetSceneName(const char* name) const;
 
 	 static void ClearErrorGL();
 	 static void CheckErrorGL(const char* call, const char* file, const int line);

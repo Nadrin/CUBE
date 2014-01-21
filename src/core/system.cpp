@@ -86,8 +86,13 @@ void System::UpdateDebugInfo()
 	if((time - lastTime) >= 0.1) {
 		char debugInfo[256];
 
+		std::string sceneName;
+		if(!DebugInfo.SceneName.empty())
+			sceneName = DebugInfo.SceneName + ": ";
+
 		lastTime = time;
-		sprintf_s(debugInfo, "%s [ %05.1fs ] %s", name, System::GetTime(), paused?"(paused)":"");
+		sprintf_s(debugInfo, "%s [ %s%05.1fs ] %s", name,
+			sceneName.c_str(), System::GetTime(), paused?"(paused)":"");
 		glfwSetWindowTitle(window, debugInfo);
 	}
 }
@@ -202,12 +207,12 @@ float System::GetTime()
 	return (float)BASS_ChannelBytes2Seconds(stream, BASS_ChannelGetPosition(stream, BASS_POS_BYTE));
 }
 
-void System::Run(RenderBlock render)
+void System::Run(RenderBlock renderFunction)
 {
 	BASS_ChannelPlay(stream, TRUE);
 
 	while(!glfwWindowShouldClose(window)) {
-		if(!render(GetTime())) 
+		if(!renderFunction(GetTime())) 
 			break;
 
 		UI->Draw();
@@ -298,6 +303,13 @@ bool System::SetContentDirectory(const std::string& path)
 const std::string& System::GetContentDirectory() const
 {
 	return contentDirectory;
+}
+
+void System::Debug_SetSceneName(const char* name) const
+{
+#ifdef _DEBUG
+	DebugInfo.SceneName = std::string(name);
+#endif
 }
 
 void System::HandleException(const std::exception& e)

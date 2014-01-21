@@ -20,7 +20,7 @@ void TestDemo::Main()
 {
 	System->SetName("CUBE: Test Demo");
 	System->UseOpenGL(4, 3);
-	System->OpenDisplay(1920, 1080, false);
+	System->OpenDisplay(1280, 720, false);
 	System->OpenStream("music.mp3");
 
 	System->SetContentDirectory(".");
@@ -30,9 +30,17 @@ void TestDemo::Main()
 	simpleShader["test"] = vec4(0.5f);
 
 	render {
-		glClear(GL_COLOR_BUFFER_BIT);
-		{
-			UseShader shader(simpleShader);
+		scene(Scene1) {
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+			block {
+				UseShader shader(simpleShader);
+			}
+		};
+
+		sequence {
+			play(Scene1, 5.0f);
+			quit;
 		}
 
 		return true;
