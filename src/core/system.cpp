@@ -187,7 +187,9 @@ void System::OpenDisplay(const int width, const int height, bool fullscreen)
 #endif
 
 	CUBE::UI = System::UI;
+
 	ClearErrorGL();
+	SetDefaults();
 }
 
 void System::SetName(const char* name)
@@ -205,9 +207,10 @@ void System::Run(RenderBlock render)
 	BASS_ChannelPlay(stream, TRUE);
 
 	while(!glfwWindowShouldClose(window)) {
-		if(!render(GetTime())) break;
-		UI->Draw();
+		if(!render(GetTime())) 
+			break;
 
+		UI->Draw();
 #ifdef _DEBUG
 		System::UpdateDebugInfo();
 		if(NotifyService)
@@ -334,4 +337,23 @@ void System::CheckErrorGL(const char* call, const char* file, const int line)
 		System::Instance()->Log("Error: %s = %02x (%s)\n  at %s:%d\n",
 			call, error, errorString.at(error).c_str(), file, line);
 	}
+}
+
+void System::SetDefaults()
+{
+	/* Depth testing */
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LEQUAL);
+
+	/* Backface culling */
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
+	glFrontFace(GL_CCW);
+
+	/* Blending */
+	glDisable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	/* Multisampling */
+	glEnable(GL_MULTISAMPLE);
 }

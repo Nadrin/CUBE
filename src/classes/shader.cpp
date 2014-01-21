@@ -262,7 +262,7 @@ void Shader::CreateParameters()
 
 		if(ptype == Parameter::Vec3 && namebuf[1] == 'c')
 			ptype = Parameter::Color3;
-		if(ptype == Parameter::Vec3 && namebuf[1] == 'd')
+		if(ptype == Parameter::Vec3 && namebuf[1] == 'v')
 			ptype = Parameter::Direction;
 		if(ptype == Parameter::Vec4 && namebuf[1] == 'c')
 			ptype = Parameter::Color4;

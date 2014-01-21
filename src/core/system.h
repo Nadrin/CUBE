@@ -35,6 +35,8 @@ private:
 	 System();
 private:
 	 void UpdateDebugInfo();
+	 void SetDefaults();
+
 	 static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 public:
 	 static System* Instance();
