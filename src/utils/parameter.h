@@ -38,7 +38,8 @@ public:
 		String,
 		Color3,
 		Color4,
-		Direction,
+		Quat,
+		Dir3,
 	};
 	enum Flags
 	{

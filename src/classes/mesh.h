@@ -16,8 +16,12 @@ protected:
 		NumBindings,
 	};
 
+protected:
 	GLuint vbo[NumBindings];
 	GLuint vao;
+
+	unsigned int numVertices;
+	unsigned int numFaces;
 
 	const std::string path;
 protected:
@@ -32,7 +36,12 @@ public:
 
 	const std::string& GetPath() const { return path; }
 
+	unsigned int GetVertexCount() const { return numVertices; }
+	unsigned int GetFaceCount() const   { return numFaces;    }
+
 	static std::string Prefix;
+
+	friend class MeshActor;
 };
 
 class Shape : public Mesh

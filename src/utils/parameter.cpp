@@ -151,7 +151,9 @@ TwType Parameter::GetUIType(Type type)
 		return TW_TYPE_COLOR3F;
 	case Type::Color4:
 		return TW_TYPE_COLOR4F;
-	case Type::Direction:
+	case Type::Quat:
+		return TW_TYPE_QUAT4F;
+	case Type::Dir3:
 		return TW_TYPE_DIR3F;
 	default:
 		return TW_TYPE_UNDEF;
@@ -176,13 +178,17 @@ std::string Parameter::ToString() const
 		const vec2& v = GetRefConst<vec2>();
 		s << v.x << "," << v.y;
 	}
-	else if(valueType == Type::Vec3 || valueType == Type::Color3 || valueType == Type::Direction) {
+	else if(valueType == Type::Vec3 || valueType == Type::Color3 || valueType == Type::Dir3) {
 		const vec3& v = GetRefConst<vec3>();
 		s << v.x << "," << v.y << "," << v.z;
 	}
 	else if(valueType == Type::Vec4 || valueType == Type::Color4) {
 		const vec4& v = GetRefConst<vec4>();
 		s << v.x << "," << v.y << "," << v.z << "," << v.w;
+	}
+	else if(valueType == Type::Quat) {
+		const quat& q = GetRefConst<quat>();
+		s << q.x << "," << q.y << "," << q.z << "," << q.w;
 	}
 	else
 		throw std::runtime_error("Invalid parameter type!");
@@ -209,13 +215,17 @@ bool Parameter::FromString(const std::string& data)
 		vec2& v = GetRef<vec2>();
 		s >> v.x; sep(s); s >> v.y;
 	}
-	else if(valueType == Type::Vec3 || valueType == Type::Color3 || valueType == Type::Direction) {
+	else if(valueType == Type::Vec3 || valueType == Type::Color3 || valueType == Type::Dir3) {
 		vec3& v = GetRef<vec3>();
 		s >> v.x; sep(s); s >> v.y; sep(s); s >> v.z;
 	}
 	else if(valueType == Type::Vec4 || valueType == Type::Color4) {
 		vec4& v = GetRef<vec4>();
 		s >> v.x; sep(s); s >> v.y; sep(s); s >> v.z; sep(s); s >> v.w;
+	}
+	else if(valueType == Type::Quat) {
+		quat& q = GetRef<quat>();
+		s >> q.x; sep(s); s >> q.y; sep(s); s >> q.z; sep(s); s >> q.w;
 	}
 	else
 		return false;
@@ -234,7 +244,7 @@ ShaderParameter::ShaderParameter(const Shader* shader, const std::string& name, 
 		valuePtr = new vec2(); break;
 	case Type::Vec3:
 	case Type::Color3:
-	case Type::Direction:
+	case Type::Dir3:
 		valuePtr = new vec3(); break;
 	case Type::Vec4:
 	case Type::Color4:
@@ -301,7 +311,7 @@ void ShaderParameter::Update()
 		uniform->operator=(GetRefConst<vec2>()); break;
 	case Type::Vec3:
 	case Type::Color3:
-	case Type::Direction:
+	case Type::Dir3:
 		uniform->operator=(GetRefConst<vec3>()); break;
 	case Type::Vec4:
 	case Type::Color4:
@@ -325,7 +335,7 @@ void TW_CALL ShaderParameter::GetCallback(void* value, void* clientData)
 	case Type::Vec4:
 		std::memcpy(value, static_cast<const float*>(ctx->sp->valuePtr) + component, sizeof(float)); break;
 	case Type::Color3:
-	case Type::Direction:
+	case Type::Dir3:
 		std::memcpy(value, ctx->sp->valuePtr, 3*sizeof(float)); break;
 	case Type::Color4:
 		std::memcpy(value, ctx->sp->valuePtr, 4*sizeof(float)); break;
@@ -348,7 +358,7 @@ void TW_CALL ShaderParameter::SetCallback(const void* value, void* clientData)
 	case Type::Vec4:
 		std::memcpy(static_cast<float*>(ctx->sp->valuePtr) + component, value, sizeof(float)); break;
 	case Type::Color3:
-	case Type::Direction:
+	case Type::Dir3:
 		std::memcpy(ctx->sp->valuePtr, value, 3*sizeof(float)); break;
 	case Type::Color4:
 		std::memcpy(ctx->sp->valuePtr, value, 4*sizeof(float)); break;

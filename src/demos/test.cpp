@@ -9,6 +9,8 @@
 #include <utils/parameter.h>
 
 #include <classes/shader.h>
+#include <classes/mesh.h>
+#include <classes/actor.h>
 
 #include <demos/test.h>
 
@@ -27,22 +29,26 @@ void TestDemo::Main()
 	Config->Read("demo.ini");
 
 	Shader simpleShader("simple");
-	simpleShader["test"] = vec4(0.5f);
+	Mesh simpleMesh("monkey.dae");
+
+	quat rotation;
+	param(Quat, rotation);
 
 	render {
-		scene(Scene1) {
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-			block {
-				UseShader shader(simpleShader);
-			}
-		};
-
-		sequence {
-			play(Scene1, 5.0f);
-			quit;
+		block {
+			UseShader(simpleShader);
+			
+			shader.object().SetCameraMatrix(
+				glm::perspective(45.0f, 1.77f, 1.0f, 100.0f), 
+				glm::lookAt(vec3(0.0f, 0.0f, -10.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f)));
+	
+			MeshActor actor(simpleMesh);
+			actor.position() = vec3(0.0f, 0.0f, 1.0f);
+			actor.rotation() = rotation;
+			DrawActor(actor);
 		}
-
 		return true;
 	};
 	commit;

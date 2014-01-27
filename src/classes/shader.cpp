@@ -224,6 +224,10 @@ Shader::Uniform& Shader::operator[](const std::string& name) const
 
 void Shader::ValidateUniforms()
 {
+	cameraMatrix = glGetUniformLocation(program, "CameraMatrix");
+	modelMatrix  = glGetUniformLocation(program, "ModelMatrix");
+	normalMatrix = glGetUniformLocation(program, "NormalMatrix");
+
 	for(auto kv : uniformCache) {
 		GLint location = gltry(glGetUniformLocation(program, kv.first.c_str()));
 		if(location == -1)
@@ -263,7 +267,7 @@ void Shader::CreateParameters()
 		if(ptype == Parameter::Vec3 && namebuf[1] == 'c')
 			ptype = Parameter::Color3;
 		if(ptype == Parameter::Vec3 && namebuf[1] == 'v')
-			ptype = Parameter::Direction;
+			ptype = Parameter::Dir3;
 		if(ptype == Parameter::Vec4 && namebuf[1] == 'c')
 			ptype = Parameter::Color4;
 
@@ -271,13 +275,43 @@ void Shader::CreateParameters()
 	}
 }
 
-UseShader::UseShader(Shader& s) : shader(&s)
+bool Shader::SetCameraMatrix(const mat4& matrix) const
+{
+	if(cameraMatrix != -1) {
+		gltry(glUniformMatrix4fv(cameraMatrix, 1, GL_FALSE, glm::value_ptr(matrix)));
+		return true;
+	}
+	return false;
+}
+
+bool Shader::SetCameraMatrix(const mat4& projection, const mat4& view) const
+{
+	if(cameraMatrix != -1) {
+		mat4 matrix = projection * view;
+		gltry(glUniformMatrix4fv(cameraMatrix, 1, GL_FALSE, glm::value_ptr(matrix)));
+		return true;
+	}
+	return false;
+}
+
+bool Shader::SetModelMatrix(const mat4& matrix) const
+{
+	if(modelMatrix != -1) {
+		gltry(glUniformMatrix4fv(modelMatrix, 1, GL_FALSE, glm::value_ptr(matrix)));
+		if(normalMatrix != -1)
+			gltry(glUniformMatrix4fv(normalMatrix, 1, GL_FALSE, glm::value_ptr(glm::inverseTranspose(matrix))));
+		return true;
+	}
+	return false;
+}
+
+ActiveShader::ActiveShader(Shader& s) : shader(&s)
 {
 	gltry(glUseProgram(shader->program));
 	shader->isActive = true;
 }
 
-UseShader::~UseShader()
+ActiveShader::~ActiveShader()
 {
 	gltry(glUseProgram(0));
 	shader->isActive = false;

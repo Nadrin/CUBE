@@ -11,7 +11,7 @@
 #define scene(name)    static auto _SceneFunction_##name = [&](float SceneTime, float SceneDuration)
 #define render         static auto _RenderFunction = [&](float Time)
 
-// Commands
+// Sequence control
 #define play(name, duration) {                                     \
 	if(_Sequence.ShouldPlay(duration)) {                           \
 		_SceneFunction_##name(_Sequence.GetSceneTime(), duration); \
@@ -24,6 +24,10 @@
 		return false;          \
 }
 #define commit System->Run(_RenderFunction)
+
+// Commands
+#define UseShader(shaderObject) ActiveShader shader(shaderObject)
+#define DrawActor(actor)        actor.Draw(shader.object())
 
 // Parameter definitions
 #define param(type, var, ...)                Parameter _param_##var(var, Parameter::type, #var, Parameter::Default, ##__VA_ARGS__)

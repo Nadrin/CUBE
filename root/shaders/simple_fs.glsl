@@ -1,11 +1,13 @@
 #version 430
 
-uniform vec4 test;
-uniform vec4 pc_test;
+in vec3  fsNormal;
 
-out vec4 outputColor;
+out vec4 FragColor;
 
 void main()
 {
-	outputColor = test + pc_test;
+	vec3 N = normalize(fsNormal);
+	float dotNL = max(0.0f, dot(N, -vec3(0.0f, 0.0f, 1.0f)));
+
+	FragColor = vec4(dotNL, dotNL, dotNL, 1.0);
 }

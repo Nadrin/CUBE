@@ -82,8 +82,8 @@ public:
 
 } // Global
 
-extern class Core::System* System;
-extern class Core::Config* Config;
-extern class Core::UI*     UI;
+extern class Core::System*  System;
+extern class Core::Config*  Config;
+extern class Core::UI*      UI;
 
 } // CUBE

@@ -48,17 +48,22 @@ public:
 	}
 	Uniform& operator=(const vec2& value)
 	{
-		UseAndSet([this, &value]() { gltry(glUniform2f(location, value.x, value.y)); });
+		UseAndSet([this, &value]() { gltry(glUniform2fv(location, 1, glm::value_ptr(value))); });
 		return *this;
 	}
 	Uniform& operator=(const vec3& value)
 	{
-		UseAndSet([this, &value]() { gltry(glUniform3f(location, value.x, value.y, value.z)); });
+		UseAndSet([this, &value]() { gltry(glUniform3fv(location, 1, glm::value_ptr(value))); });
 		return *this;
 	}
 	Uniform& operator=(const vec4& value)
 	{
-		UseAndSet([this, &value]() { gltry(glUniform4f(location, value.x, value.y, value.z, value.w)); });
+		UseAndSet([this, &value]() { gltry(glUniform4fv(location, 1, glm::value_ptr(value))); });
+		return *this;
+	}
+	Uniform& operator=(const mat4& value)
+	{
+		UseAndSet([this, &value]() { gltry(glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value))); });
 		return *this;
 	}
 

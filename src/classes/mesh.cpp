@@ -12,7 +12,7 @@ using namespace CUBE;
 
 std::string Mesh::Prefix("meshes\\");
 
-Mesh::Mesh() : vao(0)
+Mesh::Mesh() : vao(0), numVertices(0), numFaces(0)
 {
 	std::memset(vbo, 0, sizeof(vbo));
 }
@@ -90,6 +90,9 @@ void Mesh::Process(const aiScene* scene)
 
 	gltry(glBindBuffer(GL_ARRAY_BUFFER, 0));
 	gltry(glBindVertexArray(0));
+
+	numVertices = mesh->mNumVertices;
+	numFaces    = mesh->mNumFaces;
 }
 
 unsigned int Mesh::GetImportFlags() const

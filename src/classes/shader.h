@@ -14,6 +14,10 @@ protected:
 	GLuint vs, fs, gs;
 	GLuint program;
 
+	GLuint cameraMatrix;
+	GLuint modelMatrix;
+	GLuint normalMatrix;
+
 	std::string path;
 	std::string name;
 	mutable bool isActive;
@@ -45,21 +49,25 @@ public:
 	const std::string& GetPath() const { return path; }
 	const std::string& GetName() const { return name; }
 
+	bool SetCameraMatrix(const mat4& matrix) const;
+	bool SetCameraMatrix(const mat4& projection, const mat4& view) const;
+	bool SetModelMatrix(const mat4& matrix) const;
+
 	Uniform& operator[](const std::string& name) const;
 
 	static std::string Prefix;
 
 	friend Shader::NotifyHandler;
-	friend class UseShader;
+	friend class ActiveShader;
 };
 
-class UseShader
+class ActiveShader
 {
 private:
 	Shader* shader;
 public:
-	UseShader(Shader& s);
-	~UseShader();
+	ActiveShader(Shader& s);
+	~ActiveShader();
 
 	Shader::Uniform& operator[](const std::string& name) const
 	{
@@ -68,6 +76,10 @@ public:
 	Shader* operator->() const
 	{ 
 		return shader;
+	}
+	Shader& object() const
+	{
+		return *shader;
 	}
 };
 
