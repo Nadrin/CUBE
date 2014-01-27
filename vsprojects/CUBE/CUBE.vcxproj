@@ -106,6 +106,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\classes\mesh.cpp" />
     <ClCompile Include="..\..\src\classes\shader.cpp" />
     <ClCompile Include="..\..\src\core\config.cpp" />
     <ClCompile Include="..\..\src\core\system.cpp" />
@@ -120,6 +121,7 @@
     <ClCompile Include="..\..\src\utils\parameter.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\src\classes\mesh.h" />
     <ClInclude Include="..\..\src\classes\shader.h" />
     <ClInclude Include="..\..\src\classes\uniform.inl" />
     <ClInclude Include="..\..\src\core\config.h" />

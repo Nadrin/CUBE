@@ -72,6 +72,9 @@
     <ClCompile Include="..\..\src\classes\shader.cpp">
       <Filter>Source Files\classes</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\classes\mesh.cpp">
+      <Filter>Source Files\classes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\stdafx.h">
@@ -108,6 +111,9 @@
       <Filter>Header Files\classes</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\classes\uniform.inl">
+      <Filter>Header Files\classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\classes\mesh.h">
       <Filter>Header Files\classes</Filter>
     </ClInclude>
   </ItemGroup>

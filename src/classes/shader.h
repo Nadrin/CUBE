@@ -42,8 +42,8 @@ public:
 	Shader(const Shader& other) = delete;
 	virtual ~Shader();
 
-	const std::string& getPath() const { return path; }
-	const std::string& getName() const { return name; }
+	const std::string& GetPath() const { return path; }
+	const std::string& GetName() const { return name; }
 
 	Uniform& operator[](const std::string& name) const;
 

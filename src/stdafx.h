@@ -3,7 +3,9 @@
 #pragma once
 
 #define _CRT_SECURE_NO_WARNINGS
+#include <cstdio>
 #include <cstdlib>
+#include <cstdarg>
 #include <clocale>
 #include <exception>
 #include <string>

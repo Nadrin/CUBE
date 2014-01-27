@@ -7,8 +7,9 @@
 
 #include <utils/notify.h>
 
-#include <cstdio>
-#include <cstdarg>
+#ifdef _DEBUG
+#include <assimp/DefaultLogger.hpp>
+#endif
 
 using namespace CUBE;
 
@@ -105,7 +106,9 @@ void System::Init()
 #ifdef _DEBUG
 	AllocConsole();
 	SetConsoleTitleA("Debug Console");
+
 	CUBE::Config = new ConfigRW();
+	Assimp::DefaultLogger::create("", Assimp::Logger::VERBOSE);
 #else
 	CUBE::Config = new Config();
 #endif
@@ -138,6 +141,7 @@ void System::Terminate()
 	System::Log("CUBE demo toolkit terminated.\n");
 
 #ifdef _DEBUG
+	Assimp::DefaultLogger::kill();
 	FreeConsole();
 #endif
 }

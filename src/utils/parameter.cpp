@@ -251,7 +251,7 @@ ShaderParameter::ShaderParameter(const Shader* shader, const std::string& name, 
 	context[2] = { this, CallbackContext::Component::Z };
 	context[3] = { this, CallbackContext::Component::W };
 
-	ShaderParameter::Init("Shaders:" + shader->getName() + "/" + name, "");
+	ShaderParameter::Init("Shaders:" + shader->GetName() + "/" + name, "");
 }
 
 ShaderParameter::~ShaderParameter()
