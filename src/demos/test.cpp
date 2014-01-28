@@ -45,7 +45,7 @@ void TestDemo::Main()
 				glm::lookAt(vec3(0.0f, 0.0f, -10.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f)));
 	
 			MeshActor actor(simpleMesh);
-			actor.position() = vec3(0.0f, 0.0f, 1.0f);
+			actor.position() = vec3(0.0f, 0.0f, 10.0f);
 			actor.rotation() = rotation;
 			DrawActor(actor);
 		}

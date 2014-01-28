@@ -10,7 +10,9 @@
 using namespace CUBE;
 
 Actor::Actor() : parent(nullptr), isDirty(false), isAlwaysDirty(false)
-{}
+{
+	t.scale = vec3(1.0f);
+}
 
 Actor::Actor(const vec3& position, const vec3& scale)
 	: parent(nullptr), isDirty(true), isAlwaysDirty(false)
@@ -30,10 +32,9 @@ Actor::Actor(const vec3& position, const quat& rotation, const vec3& scale)
 const mat4& Actor::transform() const
 {
 	if(isDirty) {
-		transformMatrix = mat4();
-		glm::translate(transformMatrix, t.position);
+		transformMatrix  = glm::translate(mat4(), t.position);
 		transformMatrix *= glm::mat4_cast(t.rotation);
-		glm::scale(transformMatrix, t.scale);
+		transformMatrix  = glm::scale(transformMatrix, t.scale);
 
 		if(parent)
 			transformMatrix = parent->transform() * transformMatrix;
