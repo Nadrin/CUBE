@@ -4,7 +4,9 @@
 #include <core/system.h>
 #include <core/config.h>
 #include <core/ui.h>
+
 #include <utils/parameter.h>
+#include <classes/shader.h>
 
 using namespace CUBE;
 
@@ -254,7 +256,10 @@ ShaderParameter::ShaderParameter(const Shader* shader, const std::string& name, 
 	}
 
 	valueType = type;
-	uniform   = &shader->operator[](name);
+
+	Shader::Uniform* uniform = &shader->operator[](name);
+	uniform->parameter = this;
+	this->uniform = static_cast<void*>(uniform);
 
 	context[0] = { this, CallbackContext::Component::X };
 	context[1] = { this, CallbackContext::Component::Y };
@@ -302,6 +307,8 @@ void ShaderParameter::Init(const std::string& path, const std::string& def)
 
 void ShaderParameter::Update()
 {
+	Shader::Uniform* uniform = static_cast<Shader::Uniform*>(this->uniform);
+
 	switch(valueType) {
 	case Type::Int:
 		uniform->operator=(GetRefConst<int>()); break;

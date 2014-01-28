@@ -3,6 +3,7 @@
 #pragma once
 
 #include <utils/notify.h>
+#include <utils/parameter.h>
 
 namespace CUBE {
 

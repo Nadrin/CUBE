@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <classes/shader.h>
-
 namespace CUBE {
 
 class Identifier
@@ -112,8 +110,8 @@ protected:
 		} component;
 	};
 
-	Shader::Uniform* uniform;
-	CallbackContext  context[4];
+	void* uniform;
+	CallbackContext context[4];
 
 	void Init(const std::string& path, const std::string& def);
 	void Update();
@@ -121,7 +119,7 @@ protected:
 	static void TW_CALL GetCallback(void* value, void* clientData);
 	static void TW_CALL SetCallback(const void* value, void* clientData);
 public:
-	ShaderParameter(const Shader* shader, const std::string& name, Type type);
+	ShaderParameter(const class Shader* shader, const std::string& name, Type type);
 	virtual ~ShaderParameter();
 };
 
