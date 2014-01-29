@@ -124,6 +124,8 @@ void System::Init()
 		ExitProcess(1);
 	}
 
+	ilInit();
+
 	CUBE::System = this;
 	System::Log("CUBE demo toolkit initialized.\n");
 }

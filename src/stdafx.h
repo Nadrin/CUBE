@@ -24,6 +24,7 @@
 
 #include <GL/glew.h>
 #include <GL/wglew.h>
+#include <IL/il.h>
 #include <GLFW/glfw3.h>
 #include <bass.h>
 

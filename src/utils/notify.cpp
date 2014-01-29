@@ -10,14 +10,14 @@ using namespace CUBE;
 FileNotify::FileNotify(const std::string& path, unsigned long delay) : eventDelay(delay)
 {
 	char buffer[MAX_PATH];
-	GetCurrentDirectoryA(MAX_PATH, buffer);
+	GetCurrentDirectory(MAX_PATH, buffer);
 	basePath = std::string(buffer) + "\\" + path + "\\";
 
 	hEventHandle   = CreateEvent(NULL, TRUE, FALSE, NULL);
 	eventTimestamp = 0; // Not technically correct but good enough.
 	GetSystemTimeAsFileTime(&processTimestamp);
 
-	hNotifyHandle = FindFirstChangeNotificationA(basePath.c_str(), TRUE, FILE_NOTIFY_CHANGE_LAST_WRITE);
+	hNotifyHandle = FindFirstChangeNotification(basePath.c_str(), TRUE, FILE_NOTIFY_CHANGE_LAST_WRITE);
 	if(INVALID_HANDLE_VALUE == hNotifyHandle) {
 		CloseHandle(hEventHandle);
 		throw std::runtime_error("FileNotify: FindFirstChangeNotification failed.");
@@ -52,7 +52,7 @@ FILETIME FileNotify::GetFileModificationTime(const std::string& name)
 	const std::string fullPath = basePath + name;
 	FILETIME modTime;
 
-	HANDLE hFile = CreateFileA(fullPath.c_str(), 
+	HANDLE hFile = CreateFile(fullPath.c_str(), 
 		GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, OPEN_EXISTING, 0, NULL);
 	if(INVALID_HANDLE_VALUE == hFile) {
 		throw std::runtime_error("FileNotify: Cannot open file for reading.");
