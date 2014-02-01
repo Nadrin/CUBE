@@ -9,6 +9,7 @@
 
 #ifdef _DEBUG
 #include <assimp/DefaultLogger.hpp>
+#include <assimp/LogStream.hpp>
 #endif
 
 using namespace CUBE;
@@ -18,6 +19,16 @@ class Core::Config* CUBE::Config = nullptr;
 class Core::UI*     CUBE::UI     = nullptr;
 
 using namespace CUBE::Core;
+
+#ifdef _DEBUG
+struct AssimpLogStream : public Assimp::LogStream
+{
+	void write(const char* message)
+	{
+		System::Instance()->Log("Assimp: %s", message);
+	}
+};
+#endif
 
 System::System()
 	: UI(nullptr), NotifyService(nullptr), paused(false), window(NULL), stream(NULL)
@@ -108,7 +119,10 @@ void System::Init()
 	SetConsoleTitleA("Debug Console");
 
 	CUBE::Config = new ConfigRW();
+
 	Assimp::DefaultLogger::create("", Assimp::Logger::VERBOSE);
+	Assimp::DefaultLogger::get()->attachStream(new AssimpLogStream,
+		Assimp::Logger::Warn | Assimp::Logger::Err);
 #else
 	CUBE::Config = new Config();
 #endif
