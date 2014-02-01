@@ -78,6 +78,9 @@
     <ClCompile Include="..\..\src\classes\actor.cpp">
       <Filter>Source Files\classes</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\classes\texture.cpp">
+      <Filter>Source Files\classes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\stdafx.h">
@@ -121,6 +124,12 @@
     </ClInclude>
     <ClInclude Include="..\..\src\classes\actor.h">
       <Filter>Header Files\classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\classes\texture.h">
+      <Filter>Header Files\classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\utils\dim.h">
+      <Filter>Header Files\utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

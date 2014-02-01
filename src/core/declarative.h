@@ -26,8 +26,9 @@
 #define commit System->Run(_RenderFunction)
 
 // Commands
-#define UseShader(shaderObject) ActiveShader shader(shaderObject)
-#define DrawActor(actor)        actor.Draw(shader.object())
+#define UseShader(shaderObject)               ActiveShader shader(shaderObject)
+#define UseTexture(unit, textureObject, ...)  ActiveTexture texture##unit(unit, textureObject, ##__VA_ARGS__)
+#define DrawActor(actor)                      actor.Draw(shader.object())
 
 // Parameter definitions
 #define param(type, var, ...)                Parameter _param_##var(var, Parameter::type, #var, Parameter::Default, ##__VA_ARGS__)

@@ -154,9 +154,12 @@ $RECYCLE.BIN/
 # Assets & binaries
 # =========================
 
+sdk/
+
 root/*.exe
 root/*.dll
 root/*.ini
 root/*.mp3
 
-root/meshes
+root/meshes/
+root/textures/

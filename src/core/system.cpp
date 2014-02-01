@@ -374,4 +374,8 @@ void System::SetDefaults()
 
 	/* Multisampling */
 	glEnable(GL_MULTISAMPLE);
+
+	/* OpenIL setup */
+	ilEnable(IL_ORIGIN_SET);
+	ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
 }

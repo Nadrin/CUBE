@@ -109,6 +109,7 @@
     <ClCompile Include="..\..\src\classes\actor.cpp" />
     <ClCompile Include="..\..\src\classes\mesh.cpp" />
     <ClCompile Include="..\..\src\classes\shader.cpp" />
+    <ClCompile Include="..\..\src\classes\texture.cpp" />
     <ClCompile Include="..\..\src\core\config.cpp" />
     <ClCompile Include="..\..\src\core\system.cpp" />
     <ClCompile Include="..\..\src\core\ui.cpp" />
@@ -125,6 +126,7 @@
     <ClInclude Include="..\..\src\classes\actor.h" />
     <ClInclude Include="..\..\src\classes\mesh.h" />
     <ClInclude Include="..\..\src\classes\shader.h" />
+    <ClInclude Include="..\..\src\classes\texture.h" />
     <ClInclude Include="..\..\src\classes\uniform.inl" />
     <ClInclude Include="..\..\src\core\config.h" />
     <ClInclude Include="..\..\src\core\declarative.h" />
@@ -133,6 +135,7 @@
     <ClInclude Include="..\..\src\core\ui.h" />
     <ClInclude Include="..\..\src\demos\test.h" />
     <ClInclude Include="..\..\src\stdafx.h" />
+    <ClInclude Include="..\..\src\utils\dim.h" />
     <ClInclude Include="..\..\src\utils\lock.h" />
     <ClInclude Include="..\..\src\utils\notify.h" />
     <ClInclude Include="..\..\src\utils\parameter.h" />

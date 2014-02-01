@@ -27,7 +27,7 @@ protected:
 protected:
 	Mesh();
 
-	void Process(const aiScene* scene);
+	void InitResource(const aiScene* scene);
 	virtual unsigned int GetImportFlags() const;
 public:
 	Mesh(const std::string& fp);

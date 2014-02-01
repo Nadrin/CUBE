@@ -10,6 +10,7 @@
 
 #include <classes/shader.h>
 #include <classes/mesh.h>
+#include <classes/texture.h>
 #include <classes/actor.h>
 
 #include <demos/test.h>
@@ -29,7 +30,11 @@ void TestDemo::Main()
 	Config->Read("demo.ini");
 
 	Shader simpleShader("simple");
-	Mesh simpleMesh("monkey.dae");
+	simpleShader["pcColor"] = vec3(1.0f, 1.0f, 1.0f);
+	simpleShader["pvLightDirection"] = vec3(0.0f, 0.0f, 1.0f);
+
+	Mesh simpleMesh("box.dae");
+	Texture simpleTex("wood.jpg");
 
 	quat rotation;
 	param(Quat, rotation);
@@ -39,13 +44,14 @@ void TestDemo::Main()
 
 		block {
 			UseShader(simpleShader);
+			UseTexture(0, simpleTex);
 			
 			shader.object().SetCameraMatrix(
 				glm::perspective(45.0f, 1.77f, 1.0f, 100.0f), 
 				glm::lookAt(vec3(0.0f, 0.0f, -10.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f)));
 	
 			MeshActor actor(simpleMesh);
-			actor.position() = vec3(0.0f, 0.0f, 10.0f);
+			actor.position() = vec3(0.0f, 0.0f, 0.0f);
 			actor.rotation() = rotation;
 			DrawActor(actor);
 		}

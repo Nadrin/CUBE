@@ -27,7 +27,7 @@ Mesh::Mesh(const std::string& fp) : path(Prefix+fp)
 		throw std::runtime_error(importer.GetErrorString());
 	}
 
-	Process(scene);
+	InitResource(scene);
 }
 
 Mesh::~Mesh()
@@ -39,7 +39,7 @@ Mesh::~Mesh()
 	if(vbo[TexCoords0]) gltry(glDeleteBuffers(1, &vbo[TexCoords0]));
 }
 
-void Mesh::Process(const aiScene* scene)
+void Mesh::InitResource(const aiScene* scene)
 {
 	aiMesh* mesh = nullptr;
 	for(unsigned int i=0; i<scene->mNumMeshes; i++) {
@@ -125,5 +125,5 @@ Shape::Shape(const std::string& desc) : Mesh()
 		throw std::runtime_error(importer.GetErrorString());
 	}
 
-	Process(scene);
+	InitResource(scene);
 }
