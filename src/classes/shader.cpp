@@ -210,6 +210,19 @@ void Shader::NotifyHandler::operator()(const std::string& filename)
 	}
 }
 
+Shader::Uniform* Shader::GetUniform(const std::string& name) const
+{
+	auto it = uniformCache.find(name);
+	if(it != uniformCache.end())
+		return &it->second;
+
+	GLint location = gltry(glGetUniformLocation(program, name.c_str()));
+	if(location == -1)
+		return nullptr;
+
+	return &uniformCache.insert({name, Shader::Uniform(this, location)}).first->second;
+}
+
 Shader::Uniform& Shader::operator[](const std::string& name) const
 {
 	auto it = uniformCache.find(name);

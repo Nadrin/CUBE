@@ -12,6 +12,7 @@
 #include <classes/mesh.h>
 #include <classes/texture.h>
 #include <classes/actor.h>
+#include <classes/material.h>
 
 #include <demos/test.h>
 
@@ -36,6 +37,8 @@ void TestDemo::Main()
 	Mesh simpleMesh("box.dae");
 	Texture simpleTex("wood.jpg");
 
+	StdMaterial mat;
+
 	quat rotation;
 	param(Quat, rotation);
 
@@ -45,6 +48,7 @@ void TestDemo::Main()
 		block {
 			UseShader(simpleShader);
 			UseTexture(0, simpleTex);
+			UseMaterial(mat);
 			
 			shader.object().SetCameraMatrix(
 				glm::perspective(45.0f, 1.77f, 1.0f, 100.0f), 

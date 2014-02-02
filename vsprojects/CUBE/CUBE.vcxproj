@@ -107,6 +107,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\classes\actor.cpp" />
+    <ClCompile Include="..\..\src\classes\material.cpp" />
     <ClCompile Include="..\..\src\classes\mesh.cpp" />
     <ClCompile Include="..\..\src\classes\shader.cpp" />
     <ClCompile Include="..\..\src\classes\texture.cpp" />
@@ -124,6 +125,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\classes\actor.h" />
+    <ClInclude Include="..\..\src\classes\material.h" />
     <ClInclude Include="..\..\src\classes\mesh.h" />
     <ClInclude Include="..\..\src\classes\shader.h" />
     <ClInclude Include="..\..\src\classes\texture.h" />

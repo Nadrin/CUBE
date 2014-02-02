@@ -54,6 +54,9 @@ public:
 	bool SetCameraMatrix(const mat4& projection, const mat4& view) const;
 	bool SetModelMatrix(const mat4& matrix) const;
 
+	bool IsActive() const { return isActive; }
+
+	Uniform* GetUniform(const std::string& name) const;
 	Uniform& operator[](const std::string& name) const;
 
 	static std::string Prefix;
