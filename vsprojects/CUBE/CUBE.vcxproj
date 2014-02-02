@@ -130,6 +130,7 @@
     <ClInclude Include="..\..\src\classes\shader.h" />
     <ClInclude Include="..\..\src\classes\texture.h" />
     <ClInclude Include="..\..\src\classes\uniform.inl" />
+    <ClInclude Include="..\..\src\core\common.h" />
     <ClInclude Include="..\..\src\core\config.h" />
     <ClInclude Include="..\..\src\core\declarative.h" />
     <ClInclude Include="..\..\src\core\demo.h" />
@@ -137,6 +138,7 @@
     <ClInclude Include="..\..\src\core\ui.h" />
     <ClInclude Include="..\..\src\demos\test.h" />
     <ClInclude Include="..\..\src\stdafx.h" />
+    <ClInclude Include="..\..\src\utils\cache.h" />
     <ClInclude Include="..\..\src\utils\dim.h" />
     <ClInclude Include="..\..\src\utils\lock.h" />
     <ClInclude Include="..\..\src\utils\notify.h" />

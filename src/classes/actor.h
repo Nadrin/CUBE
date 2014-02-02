@@ -73,6 +73,9 @@ class MeshActor : public Actor
 {
 protected:
 	Mesh* mesh;
+
+	void DrawDefault(Shader& shader);
+	void DrawWithMaterials(Shader& shader);
 public:
 	MeshActor(Mesh& mesh)
 		: Actor(), mesh(&mesh) {}

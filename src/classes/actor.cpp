@@ -6,6 +6,7 @@
 #include <classes/actor.h>
 #include <classes/shader.h>
 #include <classes/mesh.h>
+#include <classes/material.h>
 
 using namespace CUBE;
 
@@ -44,11 +45,32 @@ const mat4& Actor::transform() const
 	return transformMatrix;
 }
 
+void MeshActor::DrawDefault(Shader& shader)
+{
+	for(const auto m : mesh->subMeshes) {
+		gltry(glBindVertexArray(m->vao));
+		gltry(glDrawArrays(GL_TRIANGLES, 0, m->GetVertexCount()));
+	}
+	gltry(glBindVertexArray(0));
+}
+
+void MeshActor::DrawWithMaterials(Shader& shader)
+{
+	for(const auto m : mesh->subMeshes) {
+		ActiveMaterial material(*mesh->materials[m->GetMaterialID()], shader);
+
+		gltry(glBindVertexArray(m->vao));
+		gltry(glDrawArrays(GL_TRIANGLES, 0, m->GetVertexCount()));
+	}
+	gltry(glBindVertexArray(0));
+}
+
 void MeshActor::Draw(Shader& shader)
 {
 	shader.SetModelMatrix(transform());
-	
-	gltry(glBindVertexArray(mesh->vao));
-	gltry(glDrawArrays(GL_TRIANGLES, 0, mesh->numVertices));
-	gltry(glBindVertexArray(0));
+
+	if(mesh->isWithMaterials)
+		DrawWithMaterials(shader);
+	else
+		DrawDefault(shader);
 }

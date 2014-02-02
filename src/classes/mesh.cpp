@@ -2,7 +2,10 @@
 
 #include <stdafx.h>
 #include <core/system.h>
+
 #include <classes/mesh.h>
+#include <classes/material.h>
+#include <classes/texture.h>
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -12,50 +15,8 @@ using namespace CUBE;
 
 std::string Mesh::Prefix("meshes\\");
 
-Mesh::Mesh() : vao(0), numVertices(0), numFaces(0)
+SubMesh::SubMesh(const aiMesh* mesh)
 {
-	std::memset(vbo, 0, sizeof(vbo));
-}
-
-Mesh::Mesh(const std::string& fp) : path(Prefix+fp)
-{
-	Core::System::Instance()->Log("Loading mesh file: %s ...\n", path.c_str());
-
-	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(path.c_str(), GetImportFlags());
-	if(!scene) {
-		throw std::runtime_error(importer.GetErrorString());
-	}
-
-	InitResource(scene);
-}
-
-Mesh::~Mesh()
-{
-	if(vao) gltry(glDeleteVertexArrays(1, &vao));
-
-	if(vbo[Positions])  gltry(glDeleteBuffers(1, &vbo[Positions]));
-	if(vbo[Normals])    gltry(glDeleteBuffers(1, &vbo[Normals]));
-	if(vbo[TexCoords0]) gltry(glDeleteBuffers(1, &vbo[TexCoords0]));
-}
-
-void Mesh::InitResource(const aiScene* scene)
-{
-	aiMesh* mesh = nullptr;
-	for(unsigned int i=0; i<scene->mNumMeshes; i++) {
-		if(scene->mMeshes[i]->HasPositions()
-			&& scene->mMeshes[i]->HasFaces()
-			&& scene->mMeshes[i]->HasNormals())
-		{
-			mesh = scene->mMeshes[i];
-			if(scene->mNumMeshes > 1)
-				Core::System::Instance()->Log("More than one sub-mesh present. Using sub-mesh #%d\n", i+1);
-		}
-	}
-
-	if(!mesh)
-		throw std::runtime_error("No suitable mesh data found in: " + path);
-
 	auto CreateBuffer = [&mesh](int index, int components, const aiVector3D* data)
 	{
 		assert(components <= 3);
@@ -93,6 +54,92 @@ void Mesh::InitResource(const aiScene* scene)
 
 	numVertices = mesh->mNumVertices;
 	numFaces    = mesh->mNumFaces;
+	materialID  = mesh->mMaterialIndex;
+}
+
+SubMesh::~SubMesh()
+{
+	if(vao) gltry(glDeleteVertexArrays(1, &vao));
+
+	if(vbo[Positions])  gltry(glDeleteBuffers(1, &vbo[Positions]));
+	if(vbo[Normals])    gltry(glDeleteBuffers(1, &vbo[Normals]));
+	if(vbo[TexCoords0]) gltry(glDeleteBuffers(1, &vbo[TexCoords0]));
+}
+
+Mesh::Mesh(Hint hint) : isWithMaterials(hint == Hint::WithMaterials)
+{}
+
+Mesh::Mesh(const std::string& fp, Hint hint)
+	: path(Prefix+fp), isWithMaterials(hint == Hint::WithMaterials)
+{
+	Core::System::Instance()->Log("Loading mesh file: %s ...\n", path.c_str());
+
+	Assimp::Importer importer;
+	const aiScene* scene = importer.ReadFile(path.c_str(), GetImportFlags());
+	if(!scene) {
+		throw std::runtime_error(importer.GetErrorString());
+	}
+
+	InitResource(scene);
+}
+
+Mesh::~Mesh()
+{
+	for(auto it : materials) {
+		delete it;
+	}
+	for(auto it : subMeshes) {
+		delete it;
+	}
+
+	textureRef.clear();
+	textureCache.Flush();
+}
+
+void Mesh::InitResource(const aiScene* scene)
+{
+	for(unsigned int i=0; i<scene->mNumMeshes; i++) {
+		const aiMesh* mesh = scene->mMeshes[i];
+		if(mesh->HasPositions() && mesh->HasFaces() && mesh->HasNormals()) {
+			subMeshes.push_back(new SubMesh(mesh));
+		}
+	}
+
+	if(subMeshes.size() == 0)
+		throw std::runtime_error("No suitable mesh data found in: " + path);
+
+	for(unsigned int i=0; i<scene->mNumMaterials; i++) {
+		const aiMaterial* material  = scene->mMaterials[i];
+
+		StdMaterial* materialObject = new StdMaterial(scene->mMaterials[i]);
+		InitTexture(materialObject, material, Texture::Diffuse);
+		materials.push_back(materialObject);
+	}
+}
+
+void Mesh::InitTexture(StdMaterial* material, const aiMaterial* source, Texture::Channel channel)
+{
+	aiTextureType type;
+
+	switch(channel) {
+	case Texture::Diffuse: type = aiTextureType_DIFFUSE; break;
+	default: assert(0);
+	}
+
+	if(!source->GetTextureCount(type))
+		return;
+
+	aiString path;
+	std::shared_ptr<Texture> texture;
+
+	source->GetTexture(type, 0, &path);
+
+	texture = textureCache.Get(path.C_Str());
+	if(!texture)
+		texture = textureCache.Insert(path.C_Str(), new Texture(path.C_Str()));
+
+	material->BindTexture(channel, *texture.get());
+	textureRef.push_back(texture);
 }
 
 unsigned int Mesh::GetImportFlags() const
@@ -115,6 +162,24 @@ unsigned int Mesh::GetImportFlags() const
 		aiProcess_FindInvalidData;
 #endif
 	return flags;
+}
+
+unsigned int Mesh::GetVertexCount() const
+{
+	unsigned int ret=0;
+	for(auto mesh : subMeshes) {
+		ret += mesh->GetVertexCount();
+	}
+	return ret;
+}
+
+unsigned int Mesh::GetFaceCount() const
+{
+	unsigned int ret=0;
+	for(auto mesh : subMeshes) {
+		ret += mesh->GetFaceCount();
+	}
+	return ret;
 }
 
 Shape::Shape(const std::string& desc) : Mesh()

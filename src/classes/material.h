@@ -7,6 +7,8 @@
 
 #define CUBE_MAX_BINDINGS 32
 
+struct aiMaterial;
+
 namespace CUBE {
 
 class Material
@@ -14,17 +16,17 @@ class Material
 protected:
 	Texture::Sampler* samplers[CUBE_MAX_BINDINGS];
 protected:
-	Material();
-	virtual void Update(Shader* shader) = 0;
+	virtual void Update(Shader* shader);
 public:
+	Material(const float Kopacity=1.0f);
 	virtual ~Material();
 
-	void BindTexture(const GLuint binding, Texture& texture,
-		GLenum minFilter=GL_LINEAR, GLenum magFilter=GL_LINEAR);
-
+	void BindTexture(const GLuint binding, Texture& texture, GLenum minFilter=GL_LINEAR, GLenum magFilter=GL_LINEAR);
 	void Unbind(const GLuint binding);
 
 	friend class ActiveMaterial;
+public: // attributes
+	float opacity;
 };
 
 class StdMaterial : public Material
@@ -33,7 +35,9 @@ protected:
 	virtual void Update(Shader* shader) override;
 public:
 	StdMaterial();
-	StdMaterial(const vec3& Kd, const vec3& Ks=vec3(), const float Kshininess=0.0f);
+	StdMaterial(const aiMaterial* material);
+	StdMaterial(const vec3& Kd, const vec3& Ks=vec3(), const float Kopacity=1.0f);
+
 public: // attributes
 	vec3  ambient;
 	vec3  diffuse;
@@ -47,6 +51,8 @@ class ActiveMaterial
 private:
 	Material* material;
 	std::list<class ActiveTexture*> textures;
+
+	bool isBlendingRequired;
 public:
 	ActiveMaterial(Material& m, Shader& shader);
 	~ActiveMaterial();

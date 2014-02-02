@@ -10,6 +10,12 @@ class Texture
 {
 public:
 	#include "sampler.inl"
+
+	enum Channel {
+		Diffuse = 0,
+		Normal,
+		MaxChannels,
+	};
 protected:
 	Dim  size;
 	int  components;
