@@ -38,6 +38,7 @@ void TestDemo::Main()
 	Texture simpleTex("wood.jpg");
 
 	StdMaterial mat;
+	mat.BindTexture(0, simpleTex);
 
 	quat rotation;
 	param(Quat, rotation);
@@ -47,7 +48,7 @@ void TestDemo::Main()
 
 		block {
 			UseShader(simpleShader);
-			UseTexture(0, simpleTex);
+			//UseTexture(0, simpleTex);
 			UseMaterial(mat);
 			
 			shader.object().SetCameraMatrix(

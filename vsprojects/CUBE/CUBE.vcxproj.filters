@@ -145,5 +145,8 @@
     <None Include="..\..\root\shaders\simple_vs.glsl">
       <Filter>Source Files\shaders\simple</Filter>
     </None>
+    <None Include="..\..\src\classes\sampler.inl">
+      <Filter>Header Files\classes</Filter>
+    </None>
   </ItemGroup>
 </Project>

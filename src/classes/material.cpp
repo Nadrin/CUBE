@@ -3,9 +3,33 @@
 #include <stdafx.h>
 #include <core/system.h>
 #include <classes/material.h>
-#include <classes/shader.h>
 
 using namespace CUBE;
+
+Material::Material()
+{
+	std::memset(samplers, 0, sizeof(samplers));
+}
+
+Material::~Material()
+{
+	for(GLuint i=0; i<CUBE_MAX_BINDINGS; i++) {
+		delete samplers[i];
+	}
+}
+
+void Material::BindTexture(const GLuint binding, Texture& texture, GLenum minFilter, GLenum magFilter)
+{
+	assert(binding < CUBE_MAX_BINDINGS);
+	samplers[binding] = new Texture::Sampler(texture, minFilter, magFilter);
+}
+
+void Material::Unbind(const GLuint binding)
+{
+	assert(binding < CUBE_MAX_BINDINGS);
+	delete samplers[binding];
+	samplers[binding] = nullptr;
+}
 
 StdMaterial::StdMaterial() : diffuse(0.5f)
 {}
@@ -33,4 +57,16 @@ void StdMaterial::Update(Shader* shader)
 ActiveMaterial::ActiveMaterial(Material& m, Shader& shader) : material(&m)
 {
 	material->Update(&shader);
+
+	for(GLuint i=0; i<CUBE_MAX_BINDINGS; i++) {
+		if(material->samplers[i])
+			textures.push_back(new ActiveTexture(i, *material->samplers[i]));
+	}
+}
+
+ActiveMaterial::~ActiveMaterial()
+{
+	for(auto activeTexture : textures) {
+		delete activeTexture;
+	}
 }

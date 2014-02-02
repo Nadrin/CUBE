@@ -8,6 +8,8 @@ namespace CUBE {
 
 class Texture
 {
+public:
+	#include "sampler.inl"
 protected:
 	Dim  size;
 	int  components;
@@ -27,27 +29,30 @@ public:
 
 	static std::string Prefix;
 
-	friend class ActiveTexture;
+	friend class Sampler;
 };
 
 class ActiveTexture
 {
 private:
-	GLenum   target;
-	GLuint   unit, sampler;
-	Texture* texture;
+	GLuint unit;
+	Texture::Sampler* sampler;
+
+	const bool ownsSampler;
 public:
 	ActiveTexture(const GLuint u, Texture& t,
 		const GLenum minFilter=GL_LINEAR, const GLenum magFilter=GL_LINEAR);
+	ActiveTexture(const GLuint u, Texture::Sampler& s);
+
 	~ActiveTexture();
 
 	Texture* operator->() const
 	{
-		return texture;
+		return sampler->GetTexture();
 	}
 	Texture& object() const
 	{
-		return *texture;
+		return *sampler->GetTexture();
 	}
 };
 

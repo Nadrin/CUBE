@@ -2,14 +2,28 @@
 
 #pragma once
 
-namespace CUBE {
+#include <classes/shader.h>
+#include <classes/texture.h>
 
-class Shader;
+#define CUBE_MAX_BINDINGS 32
+
+namespace CUBE {
 
 class Material
 {
 protected:
+	Texture::Sampler* samplers[CUBE_MAX_BINDINGS];
+protected:
+	Material();
 	virtual void Update(Shader* shader) = 0;
+public:
+	virtual ~Material();
+
+	void BindTexture(const GLuint binding, Texture& texture,
+		GLenum minFilter=GL_LINEAR, GLenum magFilter=GL_LINEAR);
+
+	void Unbind(const GLuint binding);
+
 	friend class ActiveMaterial;
 };
 
@@ -32,8 +46,10 @@ class ActiveMaterial
 {
 private:
 	Material* material;
+	std::list<class ActiveTexture*> textures;
 public:
 	ActiveMaterial(Material& m, Shader& shader);
+	~ActiveMaterial();
 
 	Material* operator->() const
 	{

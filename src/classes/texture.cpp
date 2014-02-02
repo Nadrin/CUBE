@@ -144,23 +144,22 @@ void Texture::InitResource(const ILubyte* pixels)
 	gltry(glBindTexture(target, 0));
 }
 
-ActiveTexture::ActiveTexture(const GLuint u, Texture& t,
-	const GLenum minFilter, const GLenum magFilter) : unit(u), texture(&t)
+ActiveTexture::ActiveTexture(const GLuint u, Texture& t, const GLenum minFilter, const GLenum magFilter) 
+	: unit(u), ownsSampler(true)
 {
-	target = texture->GetTarget();
+	sampler = new Texture::Sampler(t, minFilter, magFilter);
+	sampler->Bind(unit);
+}
 
-	gltry(glGenSamplers(1, &sampler));
-	gltry(glSamplerParameteri(sampler, GL_TEXTURE_MIN_FILTER, minFilter));
-	gltry(glSamplerParameteri(sampler, GL_TEXTURE_MAG_FILTER, magFilter));
-
-	gltry(glActiveTexture(GL_TEXTURE0+unit));
-	gltry(glBindTexture(target, texture->id));
-	gltry(glBindSampler(unit, sampler));
+ActiveTexture::ActiveTexture(const GLuint u, Texture::Sampler& s)
+	: unit(u), sampler(&s), ownsSampler(false)
+{
+	sampler->Bind(unit);
 }
 
 ActiveTexture::~ActiveTexture()
 {
-	gltry(glDeleteSamplers(1, &sampler));
-	gltry(glActiveTexture(GL_TEXTURE0+unit));
-	gltry(glBindTexture(target, 0));
+	sampler->Unbind(unit);
+	if(ownsSampler)
+		delete sampler;
 }
