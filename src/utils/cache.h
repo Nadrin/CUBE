@@ -36,7 +36,7 @@ public:
 	{
 		for(auto it=cache.begin(); it!=cache.end();) {
 			if(it->second.expired())
-				cache.erase(it);
+				cache.erase(it++);
 			else
 				++it;
 		}
