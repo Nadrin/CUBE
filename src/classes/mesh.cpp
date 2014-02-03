@@ -110,7 +110,7 @@ Mesh::Mesh(Hint hint) : isWithMaterials(hint == Hint::WithMaterials)
 Mesh::Mesh(const std::string& fp, Hint hint)
 	: path(Prefix+fp), isWithMaterials(hint == Hint::WithMaterials)
 {
-	Core::System::Instance()->Log("Loading mesh file: %s ...\n", path.c_str());
+	Core::System::Instance()->Log("Loading mesh file: %s\n", path.c_str());
 
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(path.c_str(), GetImportFlags());

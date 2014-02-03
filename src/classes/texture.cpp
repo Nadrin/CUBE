@@ -16,11 +16,13 @@ Texture::Texture(const Dim& dim, const int comp, bool hdr)
 
 Texture::Texture(const std::string& path, bool forceHdr)
 {
+
 	ILuint image;
 	ilGenImages(1, &image);
 	ilBindImage(image);
 
 	const std::string fp(Prefix+path);
+	Core::System::Instance()->Log("Loading texture file: %s\n", fp.c_str());
 	if(!ilLoadImage(fp.c_str())) {
 		ilDeleteImages(1, &image);
 		throw std::runtime_error("Failed to load texture image file: " + fp);

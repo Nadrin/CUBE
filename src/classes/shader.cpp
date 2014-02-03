@@ -85,7 +85,7 @@ GLuint Shader::CompileShader(GLenum type)
 		gltry(glShaderSource(shader, 1, inSource, inLength));
 	}
 
-	Core::System::Instance()->Log("Compiling shader: %s ...\n", filename.c_str());
+	Core::System::Instance()->Log("Compiling shader: %s\n", filename.c_str());
 	gltry(glCompileShader(shader));
 #ifdef _DEBUG
 	{
@@ -145,7 +145,7 @@ void Shader::DeleteShader(GLenum type, GLuint& id)
 
 void Shader::LinkProgram()
 {
-	Core::System::Instance()->Log("Linking shader program: %s ...\n", path.c_str());
+	Core::System::Instance()->Log("Linking shader program: %s\n", path.c_str());
 	gltry(glLinkProgram(program));
 
 	GLint status;
