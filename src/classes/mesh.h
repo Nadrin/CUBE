@@ -2,12 +2,15 @@
 
 #pragma once
 
+#include <assimp/types.h>
+
 #include <classes/texture.h>
 #include <utils/cache.h>
 
 struct aiMesh;
 struct aiScene;
 struct aiMaterial;
+struct aiFace;
 
 namespace CUBE {
 
@@ -24,7 +27,9 @@ protected:
 	};
 protected:
 	GLuint vbo[NumBindings];
-	GLuint vao;
+	GLuint ibo, vao;
+
+	mutable GLenum indexType;
 
 	unsigned int numVertices;
 	unsigned int numFaces;
@@ -32,6 +37,12 @@ protected:
 
 	SubMesh(const aiMesh* mesh);
 	virtual ~SubMesh();
+
+	GLuint CreateVertexBuffer(int index, int components, const aiVector3D* data) const;
+	GLuint CreateIndexBuffer(const aiFace* data) const;
+private:
+	template<typename T>
+	void GenerateIndices(const aiFace* data) const;
 public:
 	unsigned int GetVertexCount() const { return numVertices; }
 	unsigned int GetFaceCount() const   { return numFaces;    }

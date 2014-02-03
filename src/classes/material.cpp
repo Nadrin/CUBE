@@ -51,6 +51,8 @@ StdMaterial::StdMaterial(const aiMaterial* material)
 	: Material(), shininess(10.0f)
 {
 	aiColor3D value;
+	float shininessStr = 1.0f;
+
 	auto GetValue = [&value]() { return vec3(value.r, value.g, value.b); };
 	
 	if(AI_SUCCESS == material->Get(AI_MATKEY_COLOR_AMBIENT, value))
@@ -64,6 +66,9 @@ StdMaterial::StdMaterial(const aiMaterial* material)
 
 	material->Get(AI_MATKEY_SHININESS, shininess);
 	material->Get(AI_MATKEY_OPACITY, opacity);
+
+	material->Get(AI_MATKEY_SHININESS_STRENGTH, shininessStr);
+	shininess *= shininessStr;
 }
 
 void StdMaterial::Update(Shader* shader)

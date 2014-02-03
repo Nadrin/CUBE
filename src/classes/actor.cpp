@@ -49,7 +49,7 @@ void MeshActor::DrawDefault(Shader& shader)
 {
 	for(const auto m : mesh->subMeshes) {
 		gltry(glBindVertexArray(m->vao));
-		gltry(glDrawArrays(GL_TRIANGLES, 0, m->GetVertexCount()));
+		gltry(glDrawElements(GL_TRIANGLES, m->GetFaceCount()*3, m->indexType, 0));
 	}
 	gltry(glBindVertexArray(0));
 }
@@ -60,7 +60,7 @@ void MeshActor::DrawWithMaterials(Shader& shader)
 		ActiveMaterial material(*mesh->materials[m->GetMaterialID()], shader);
 
 		gltry(glBindVertexArray(m->vao));
-		gltry(glDrawArrays(GL_TRIANGLES, 0, m->GetVertexCount()));
+		gltry(glDrawElements(GL_TRIANGLES, m->GetFaceCount()*3, m->indexType, 0));
 	}
 	gltry(glBindVertexArray(0));
 }
