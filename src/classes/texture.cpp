@@ -102,7 +102,7 @@ GLenum Texture::GetFormat() const
 {
 	switch(components) {
 	case 1:
-		return GL_R;
+		return GL_RED;
 	case 2:
 		return GL_RG;
 	case 3:
