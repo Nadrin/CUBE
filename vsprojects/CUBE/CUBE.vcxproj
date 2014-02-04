@@ -107,6 +107,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\classes\actor.cpp" />
+    <ClCompile Include="..\..\src\classes\camera.cpp" />
     <ClCompile Include="..\..\src\classes\material.cpp" />
     <ClCompile Include="..\..\src\classes\mesh.cpp" />
     <ClCompile Include="..\..\src\classes\shader.cpp" />
@@ -125,6 +126,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\classes\actor.h" />
+    <ClInclude Include="..\..\src\classes\camera.h" />
     <ClInclude Include="..\..\src\classes\material.h" />
     <ClInclude Include="..\..\src\classes\mesh.h" />
     <ClInclude Include="..\..\src\classes\shader.h" />

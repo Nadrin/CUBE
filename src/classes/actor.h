@@ -61,35 +61,11 @@ public:
 		return *this;
 	}
 public: // attributes
-	vec3& position() { isDirty=true; return t.position; }
-	vec3& scale()    { isDirty=true; return t.scale;    }
-	quat& rotation() { isDirty=true; return t.rotation; }
+	vec3& position() { MarkDirty(); return t.position; }
+	vec3& scale()    { MarkDirty(); return t.scale;    }
+	quat& rotation() { MarkDirty(); return t.rotation; }
 
 	const mat4& transform() const;
-};
-
-class Mesh;
-
-class MeshActor : public Actor
-{
-protected:
-	Mesh* mesh;
-
-	void DrawDefault(Shader& shader);
-	void DrawWithMaterials(Shader& shader);
-public:
-	MeshActor(Mesh& mesh)
-		: Actor(), mesh(&mesh) {}
-	MeshActor(Mesh& mesh, const vec3& position, const vec3& scale=vec3(1.0f))
-		: Actor(position, scale), mesh(&mesh) {}
-	MeshActor(Mesh& mesh, const vec3& position, const quat& rotation, const vec3& scale=vec3(1.0f))
-		: Actor(position, rotation, scale), mesh(&mesh) {}
-
-	Mesh* operator->() const { return mesh;  }
-	Mesh& object() const     { return *mesh; }
-
-	using Actor::Draw;
-	virtual void Draw(Shader& shader) override;
 };
 
 } // CUBE

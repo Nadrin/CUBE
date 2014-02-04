@@ -47,38 +47,6 @@ const mat4& Actor::transform() const
 
 void Actor::Draw()
 {
-	ActiveShader* shader = ActiveShader::Stack.Current();
-	if(shader) {
-		Draw(*shader->ptr());
-	}
-}
-
-void MeshActor::DrawDefault(Shader& shader)
-{
-	for(const auto m : mesh->subMeshes) {
-		gltry(glBindVertexArray(m->vao));
-		gltry(glDrawElements(GL_TRIANGLES, m->GetFaceCount()*3, m->indexType, 0));
-	}
-	gltry(glBindVertexArray(0));
-}
-
-void MeshActor::DrawWithMaterials(Shader& shader)
-{
-	for(const auto m : mesh->subMeshes) {
-		ActiveMaterial material(*mesh->materials[m->GetMaterialID()], shader);
-
-		gltry(glBindVertexArray(m->vao));
-		gltry(glDrawElements(GL_TRIANGLES, m->GetFaceCount()*3, m->indexType, 0));
-	}
-	gltry(glBindVertexArray(0));
-}
-
-void MeshActor::Draw(Shader& shader)
-{
-	shader.SetModelMatrix(transform());
-
-	if(mesh->isWithMaterials)
-		DrawWithMaterials(shader);
-	else
-		DrawDefault(shader);
+	assert(!ActiveShader::Stack.IsEmpty());
+	Draw(ActiveShader::Stack.Current()->object());
 }

@@ -27,6 +27,7 @@
 
 // Commands
 #define UseShader(shaderObject)               ActiveShader shader(shaderObject)
+#define UseCamera(cameraActor)                ActiveCamera camera(cameraActor)
 #define UseMaterial(materialObject)           ActiveMaterial material(materialObject)
 #define UseTexture(unit, textureObject, ...)  ActiveTexture texture##unit(unit, textureObject, ##__VA_ARGS__)
 #define DrawActor(actor)                      actor.Draw()

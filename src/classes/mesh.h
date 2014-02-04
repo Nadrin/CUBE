@@ -4,6 +4,7 @@
 
 #include <assimp/types.h>
 
+#include <classes/actor.h>
 #include <classes/texture.h>
 #include <utils/cache.h>
 
@@ -102,6 +103,28 @@ struct CubeShape : public Shape
 struct SphereShape : public Shape
 {
 	SphereShape(float radius) : Shape("s 0 0 0 " + std::to_string(radius)) {}
+};
+
+class MeshActor : public Actor
+{
+protected:
+	Mesh* mesh;
+
+	void DrawDefault(Shader& shader);
+	void DrawWithMaterials(Shader& shader);
+public:
+	MeshActor(Mesh& mesh)
+		: Actor(), mesh(&mesh) {}
+	MeshActor(Mesh& mesh, const vec3& position, const vec3& scale=vec3(1.0f))
+		: Actor(position, scale), mesh(&mesh) {}
+	MeshActor(Mesh& mesh, const vec3& position, const quat& rotation, const vec3& scale=vec3(1.0f))
+		: Actor(position, rotation, scale), mesh(&mesh) {}
+
+	Mesh* operator->() const { return mesh;  }
+	Mesh& object() const     { return *mesh; }
+
+	using Actor::Draw;
+	virtual void Draw(Shader& shader) override;
 };
 
 } // CUBE
