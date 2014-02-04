@@ -15,6 +15,8 @@ private:
 		GLint previousProgram;
 		bool  switchProgram = false;
 
+		if(location == -1) return;
+
 		if(!shader->isActive) {
 			gltry(glGetIntegerv(GL_CURRENT_PROGRAM, &previousProgram));
 			switchProgram = previousProgram != shader->program;

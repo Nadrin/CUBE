@@ -12,7 +12,8 @@ using namespace CUBE;
 std::string Shader::Prefix("shaders\\");
 
 Shader::Shader(const std::string& path) 
-	: name(path), path(Prefix+path), notifyHandler(this), isActive(false), vs(0), fs(0), gs(0)
+	: name(path), path(Prefix+path), notifyHandler(this), nullUniform(this),
+	  isActive(false), vs(0), fs(0), gs(0)
 {
 	program = gltry(glCreateProgram());
 
@@ -218,7 +219,7 @@ Shader::Uniform* Shader::GetUniform(const std::string& name) const
 
 	GLint location = gltry(glGetUniformLocation(program, name.c_str()));
 	if(location == -1)
-		return nullptr;
+		return &nullUniform;
 
 	return &uniformCache.insert({name, Shader::Uniform(this, location)}).first->second;
 }
@@ -230,7 +231,8 @@ Shader::Uniform& Shader::operator[](const std::string& name) const
 		return it->second;
 
 	GLint location = gltry(glGetUniformLocation(program, name.c_str()));
-	assert(location != -1);
+	if(location == -1)
+		return nullUniform;
 
 	return uniformCache.insert({name, Shader::Uniform(this, location)}).first->second;
 }
@@ -241,11 +243,17 @@ void Shader::ValidateUniforms()
 	modelMatrix  = glGetUniformLocation(program, "ModelMatrix");
 	normalMatrix = glGetUniformLocation(program, "NormalMatrix");
 
-	for(auto kv : uniformCache) {
-		GLint location = gltry(glGetUniformLocation(program, kv.first.c_str()));
-		if(location == -1)
-			throw std::runtime_error("Cannot validate shader uniforms.");
-		kv.second.location = location;
+	for(auto it=uniformCache.begin(); it!=uniformCache.end();) {
+		GLint location = gltry(glGetUniformLocation(program, it->first.c_str()));
+
+		if(location == -1) {
+			Core::System::Instance()->Log("Warning: Removed shader uniform %s::%s\n", name.c_str(), it->first.c_str());
+			uniformCache.erase(it++);
+		}
+		else {
+			it->second.location = location;
+			++it;
+		}
 	}
 }
 

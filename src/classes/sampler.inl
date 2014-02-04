@@ -36,6 +36,11 @@ public:
 		gltry(glBindSampler(unit, 0));
 	}
 
+	void Set(const GLenum key, const GLenum value) const
+	{
+		gltry(glSamplerParameteri(id, key, value));
+	}
+
 	Texture* GetTexture() const
 	{
 		return texture;

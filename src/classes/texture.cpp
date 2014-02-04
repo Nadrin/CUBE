@@ -149,19 +149,19 @@ void Texture::InitResource(const ILubyte* pixels)
 ActiveTexture::ActiveTexture(const GLuint u, Texture& t, const GLenum minFilter, const GLenum magFilter) 
 	: unit(u), ownsSampler(true)
 {
-	sampler = new Texture::Sampler(t, minFilter, magFilter);
-	sampler->Bind(unit);
+	samplerObject = new Texture::Sampler(t, minFilter, magFilter);
+	samplerObject->Bind(unit);
 }
 
 ActiveTexture::ActiveTexture(const GLuint u, Texture::Sampler& s)
-	: unit(u), sampler(&s), ownsSampler(false)
+	: unit(u), samplerObject(&s), ownsSampler(false)
 {
-	sampler->Bind(unit);
+	samplerObject->Bind(unit);
 }
 
 ActiveTexture::~ActiveTexture()
 {
-	sampler->Unbind(unit);
+	samplerObject->Unbind(unit);
 	if(ownsSampler)
-		delete sampler;
+		delete samplerObject;
 }

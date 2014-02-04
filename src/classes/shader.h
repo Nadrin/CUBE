@@ -23,6 +23,8 @@ protected:
 	std::string name;
 	mutable bool isActive;
 
+	mutable Uniform nullUniform;
+
 	std::list<class ShaderParameter*> uniformParameters;
 	mutable std::map<std::string, Uniform> uniformCache;
 

@@ -42,7 +42,7 @@ class ActiveTexture
 {
 private:
 	GLuint unit;
-	Texture::Sampler* sampler;
+	Texture::Sampler* samplerObject;
 
 	const bool ownsSampler;
 public:
@@ -54,11 +54,15 @@ public:
 
 	Texture* operator->() const
 	{
-		return sampler->GetTexture();
+		return samplerObject->GetTexture();
 	}
 	Texture& object() const
 	{
-		return *sampler->GetTexture();
+		return *samplerObject->GetTexture();
+	}
+	Texture::Sampler& sampler() const
+	{
+		return *samplerObject;
 	}
 };
 
