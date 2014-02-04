@@ -140,6 +140,15 @@ void TweakBarUI::PlaceBar(TwBar* bar, const int maxIndex)
 	TwDefine(sdef.str().c_str());
 }
 
+void TweakBarUI::SetDefaultDef(std::stringstream& buffer, TwType type, const std::string& def) const
+{
+	if(type == TW_TYPE_FLOAT || type == TW_TYPE_DOUBLE) {
+		if(def.find("step=") == std::string::npos) {
+			buffer << " step=" << glm::abs(Precision) << " ";
+		}
+	}
+}
+
 TwBar* TweakBarUI::AddBar(const std::string& name)
 {
 	TwBar* bar = TwNewBar(name.c_str());
@@ -162,6 +171,8 @@ void TweakBarUI::AddVariable(TwBar* bar, const Identifier& ident, TwType type, v
 	std::stringstream buffer;
 	buffer << def << " ";
 
+	SetDefaultDef(buffer, type, def);
+
 	if(!ident.group.empty()) {
 		buffer << "group='" << ident.group << "'";
 	}
@@ -173,6 +184,8 @@ void TweakBarUI::AddVariable(TwBar* bar, const Identifier& ident, TwType type,
 {
 	std::stringstream buffer;
 	buffer << def << " ";
+
+	SetDefaultDef(buffer, type, def);
 
 	if(!ident.group.empty()) {
 		buffer << "group='" << ident.group << "'";

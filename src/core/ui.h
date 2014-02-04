@@ -18,11 +18,12 @@ class UI
 {
 public:
 	PlacementMode Placement;
-	int Padding;
+	int   Padding;
+	float Precision;
 protected:
 	bool active;
 
-	UI() : active(false), Padding(10), Placement(PlacementMode::Horizontal) {}
+	UI() : active(false), Padding(10), Precision(0.1f), Placement(PlacementMode::Horizontal) {}
 public:
 	virtual ~UI() {}
 
@@ -66,6 +67,7 @@ protected:
 	static void UnicodeCharCallback(GLFWwindow* window, unsigned int character);
 protected:
 	void PlaceBar(TwBar* bar, const int maxIndex);
+	void SetDefaultDef(std::stringstream& buffer, TwType type, const std::string& def) const;
 public:
 	TweakBarUI(GLFWwindow* window, const int width, const int height);
 	virtual ~TweakBarUI();
