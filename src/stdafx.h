@@ -14,6 +14,7 @@
 #include <queue>
 #include <vector>
 #include <list>
+#include <deque>
 #include <map>
 #include <algorithm>
 #include <memory>

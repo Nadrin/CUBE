@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <utils/stack.h>
 #include <utils/notify.h>
 #include <utils/parameter.h>
 
@@ -21,7 +22,6 @@ protected:
 
 	std::string path;
 	std::string name;
-	mutable bool isActive;
 
 	mutable Uniform nullUniform;
 
@@ -56,37 +56,30 @@ public:
 	bool SetCameraMatrix(const mat4& projection, const mat4& view) const;
 	bool SetModelMatrix(const mat4& matrix) const;
 
-	bool IsActive() const { return isActive; }
-
+	bool IsActive() const;
+	
 	Uniform* GetUniform(const std::string& name) const;
 	Uniform& operator[](const std::string& name) const;
 
 	static std::string Prefix;
+	static Shader* Current();
 
 	friend Shader::NotifyHandler;
 	friend class ActiveShader;
 };
 
-class ActiveShader
+class ActiveShader : public ActiveObject<Shader>
 {
-private:
-	Shader* shader;
 public:
 	ActiveShader(Shader& s);
 	~ActiveShader();
 
 	Shader::Uniform& operator[](const std::string& name) const
 	{
-		return shader->operator[](name);
+		return objectPtr->operator[](name);
 	}
-	Shader* operator->() const
-	{ 
-		return shader;
-	}
-	Shader& object() const
-	{
-		return *shader;
-	}
+
+	CUBE_DECLSTACK(ActiveShader);
 };
 
 } // CUBE

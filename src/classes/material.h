@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <utils/stack.h>
 #include <classes/shader.h>
 #include <classes/texture.h>
 
@@ -23,6 +24,9 @@ public:
 
 	void BindTexture(const GLuint binding, Texture& texture, GLenum minFilter=GL_LINEAR, GLenum magFilter=GL_LINEAR);
 	void Unbind(const GLuint binding);
+
+	bool IsActive() const;
+	static Material* Current();
 
 	friend class ActiveMaterial;
 public: // attributes
@@ -46,25 +50,19 @@ public: // attributes
 	float shininess;
 };
 
-class ActiveMaterial
+class ActiveMaterial : public ActiveObject<Material>
 {
 private:
-	Material* material;
 	std::list<class ActiveTexture*> textures;
-
 	bool isBlendingRequired;
+
+	void Init(Shader* shader);
 public:
+	ActiveMaterial(Material& m);
 	ActiveMaterial(Material& m, Shader& shader);
 	~ActiveMaterial();
 
-	Material* operator->() const
-	{
-		return material;
-	}
-	Material& object() const
-	{
-		return *material;
-	}
+	CUBE_DECLSTACK(ActiveMaterial);
 };
 
 } // CUBE

@@ -143,6 +143,7 @@
     <ClInclude Include="..\..\src\utils\lock.h" />
     <ClInclude Include="..\..\src\utils\notify.h" />
     <ClInclude Include="..\..\src\utils\parameter.h" />
+    <ClInclude Include="..\..\src\utils\stack.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\root\shaders\simple_fs.glsl" />

@@ -143,6 +143,9 @@
     <ClInclude Include="..\..\src\core\common.h">
       <Filter>Header Files\core</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\utils\stack.h">
+      <Filter>Header Files\utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\root\shaders\simple_fs.glsl">

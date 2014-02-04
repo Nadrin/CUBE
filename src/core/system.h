@@ -2,6 +2,8 @@
 
 #pragma once
 
+#define CUBE_LOG(fmt, ...) Core::System::Instance()->Log(fmt, ##__VA_ARGS__)
+
 namespace CUBE {
 
 class FileNotify;

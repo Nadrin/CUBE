@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <utils/stack.h>
 #include <utils/dim.h>
 
 namespace CUBE {
@@ -38,7 +39,7 @@ public:
 	friend class Sampler;
 };
 
-class ActiveTexture
+class ActiveTexture : public ActiveObject<Texture>
 {
 private:
 	GLuint unit;
@@ -52,14 +53,6 @@ public:
 
 	~ActiveTexture();
 
-	Texture* operator->() const
-	{
-		return samplerObject->GetTexture();
-	}
-	Texture& object() const
-	{
-		return *samplerObject->GetTexture();
-	}
 	Texture::Sampler& sampler() const
 	{
 		return *samplerObject;

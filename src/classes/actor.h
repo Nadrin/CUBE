@@ -25,6 +25,7 @@ public:
 	Actor(const vec3& position, const vec3& scale=vec3(1.0f));
 	Actor(const vec3& position, const quat& rotation, const vec3& scale=vec3(1.0f));
 
+	virtual void Draw();
 	virtual void Draw(Shader& shader) {}
 
 	void MarkDirty()
@@ -87,6 +88,7 @@ public:
 	Mesh* operator->() const { return mesh;  }
 	Mesh& object() const     { return *mesh; }
 
+	using Actor::Draw;
 	virtual void Draw(Shader& shader) override;
 };
 

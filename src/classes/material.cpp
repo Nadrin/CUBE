@@ -40,6 +40,18 @@ void Material::Update(Shader* shader)
 		(*uniform) = opacity;
 }
 
+bool Material::IsActive() const
+{
+	return ActiveMaterial::Stack.Current() && ActiveMaterial::Stack.Current()->InstanceOf(this);
+}
+
+Material* Material::Current()
+{
+	if(ActiveMaterial::Stack.Current())
+		return ActiveMaterial::Stack.Current()->ptr();
+	return nullptr;
+}
+
 StdMaterial::StdMaterial() : Material(), diffuse(0.5f), shininess(10.0f)
 {}
 
@@ -88,18 +100,33 @@ void StdMaterial::Update(Shader* shader)
 		(*uniform) = shininess;
 }
 
-ActiveMaterial::ActiveMaterial(Material& m, Shader& shader) : material(&m)
-{
-	material->Update(&shader);
+CUBE_STACK(ActiveMaterial);
 
-	isBlendingRequired = material->opacity < 1.0f;
+ActiveMaterial::ActiveMaterial(Material& m) : ActiveObject(m)
+{
+	CUBE_PUSH;
+	assert(ActiveShader::Stack.Current());
+	Init(ActiveShader::Stack.Current()->ptr());
+}
+
+ActiveMaterial::ActiveMaterial(Material& m, Shader& shader) : ActiveObject(m)
+{
+	CUBE_PUSH;
+	Init(&shader);
+}
+
+void ActiveMaterial::Init(Shader* shader)
+{
+	objectPtr->Update(shader);
+
+	isBlendingRequired = objectPtr->opacity < 1.0f;
 	if(isBlendingRequired) {
 		gltry(glEnable(GL_BLEND));
 	}
 
 	for(GLuint i=0; i<CUBE_MAX_BINDINGS; i++) {
-		if(material->samplers[i])
-			textures.push_back(new ActiveTexture(i, *material->samplers[i]));
+		if(objectPtr->samplers[i])
+			textures.push_back(new ActiveTexture(i, *objectPtr->samplers[i]));
 	}
 }
 
@@ -111,4 +138,5 @@ ActiveMaterial::~ActiveMaterial()
 	for(auto activeTexture : textures) {
 		delete activeTexture;
 	}
+	CUBE_POP;
 }

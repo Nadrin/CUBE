@@ -45,6 +45,14 @@ const mat4& Actor::transform() const
 	return transformMatrix;
 }
 
+void Actor::Draw()
+{
+	ActiveShader* shader = ActiveShader::Stack.Current();
+	if(shader) {
+		Draw(*shader->ptr());
+	}
+}
+
 void MeshActor::DrawDefault(Shader& shader)
 {
 	for(const auto m : mesh->subMeshes) {

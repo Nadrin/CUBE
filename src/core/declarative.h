@@ -27,9 +27,9 @@
 
 // Commands
 #define UseShader(shaderObject)               ActiveShader shader(shaderObject)
-#define UseMaterial(materialObject)           ActiveMaterial material(materialObject, shader.object())
+#define UseMaterial(materialObject)           ActiveMaterial material(materialObject)
 #define UseTexture(unit, textureObject, ...)  ActiveTexture texture##unit(unit, textureObject, ##__VA_ARGS__)
-#define DrawActor(actor)                      actor.Draw(shader.object())
+#define DrawActor(actor)                      actor.Draw()
 
 // Parameter definitions
 #define param(type, var, ...)                Parameter _param_##var(var, Parameter::type, #var, Parameter::Default, ##__VA_ARGS__)

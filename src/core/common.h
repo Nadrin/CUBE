@@ -24,4 +24,32 @@ enum class Hint
 	WithMaterials,
 };
 
+template<class T>
+class ActiveObject
+{
+protected:
+	T* objectPtr;
+
+	ActiveObject(T& ref) : objectPtr(&ref)
+	{}
+public:
+	T* operator->() const
+	{
+		return objectPtr;
+	}
+	T* ptr() const
+	{
+		return objectPtr;
+	}
+	T& object() const
+	{
+		return *objectPtr;
+	}
+
+	bool InstanceOf(const T* other) const
+	{
+		return objectPtr == other;
+	}
+};
+
 } // CUBE

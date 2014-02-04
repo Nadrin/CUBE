@@ -13,7 +13,7 @@ std::string Shader::Prefix("shaders\\");
 
 Shader::Shader(const std::string& path) 
 	: name(path), path(Prefix+path), notifyHandler(this), nullUniform(this),
-	  isActive(false), vs(0), fs(0), gs(0)
+	  vs(0), fs(0), gs(0)
 {
 	program = gltry(glCreateProgram());
 
@@ -326,14 +326,28 @@ bool Shader::SetModelMatrix(const mat4& matrix) const
 	return false;
 }
 
-ActiveShader::ActiveShader(Shader& s) : shader(&s)
+bool Shader::IsActive() const
 {
-	gltry(glUseProgram(shader->program));
-	shader->isActive = true;
+	return ActiveShader::Stack.Current() && ActiveShader::Stack.Current()->InstanceOf(this);
+}
+
+Shader* Shader::Current()
+{
+	if(ActiveShader::Stack.Current())
+		return ActiveShader::Stack.Current()->ptr();
+	return nullptr;
+}
+
+CUBE_STACK(ActiveShader);
+
+ActiveShader::ActiveShader(Shader& s) : ActiveObject(s)
+{
+	CUBE_PUSH;
+	gltry(glUseProgram(objectPtr->program));
 }
 
 ActiveShader::~ActiveShader()
 {
 	gltry(glUseProgram(0));
-	shader->isActive = false;
+	CUBE_POP;
 }

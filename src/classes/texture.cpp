@@ -147,14 +147,14 @@ void Texture::InitResource(const ILubyte* pixels)
 }
 
 ActiveTexture::ActiveTexture(const GLuint u, Texture& t, const GLenum minFilter, const GLenum magFilter) 
-	: unit(u), ownsSampler(true)
+	: ActiveObject(t), unit(u), ownsSampler(true)
 {
 	samplerObject = new Texture::Sampler(t, minFilter, magFilter);
 	samplerObject->Bind(unit);
 }
 
 ActiveTexture::ActiveTexture(const GLuint u, Texture::Sampler& s)
-	: unit(u), samplerObject(&s), ownsSampler(false)
+	: ActiveObject(*s.GetTexture()), unit(u), samplerObject(&s), ownsSampler(false)
 {
 	samplerObject->Bind(unit);
 }

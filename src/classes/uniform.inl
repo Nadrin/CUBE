@@ -12,22 +12,26 @@ private:
 
 	void UseAndSet(std::function<void ()> glCall)
 	{
-		GLint previousProgram;
-		bool  switchProgram = false;
+		Shader* restoreShader = nullptr;
+		const bool isActive   = shader->IsActive();
 
 		if(location == -1) return;
 
-		if(!shader->isActive) {
-			gltry(glGetIntegerv(GL_CURRENT_PROGRAM, &previousProgram));
-			switchProgram = previousProgram != shader->program;
-			if(switchProgram)
-				gltry(glUseProgram(shader->program));
+		if(!isActive) {
+			restoreShader = Shader::Current();
+			gltry(glUseProgram(shader->program));
 		}
 
 		glCall();
 
-		if(switchProgram)
-			gltry(glUseProgram(previousProgram));
+		if(!isActive) {
+			if(restoreShader) {
+				gltry(glUseProgram(restoreShader->program));
+			}
+			else {
+				gltry(glUseProgram(0));
+			}
+		}
 	}
 
 	template<typename T> void UpdateParameter(const T& value)
