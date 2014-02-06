@@ -87,6 +87,9 @@
     <ClCompile Include="..\..\src\classes\camera.cpp">
       <Filter>Source Files\classes</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\classes\framebuffer.cpp">
+      <Filter>Source Files\classes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\stdafx.h">
@@ -150,6 +153,9 @@
       <Filter>Header Files\utils</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\classes\camera.h">
+      <Filter>Header Files\classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\classes\framebuffer.h">
       <Filter>Header Files\classes</Filter>
     </ClInclude>
   </ItemGroup>

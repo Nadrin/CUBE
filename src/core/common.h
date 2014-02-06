@@ -2,6 +2,9 @@
 
 #pragma once
 
+#define CUBE_MAX_ATTACHMENTS 16
+#define CUBE_MAX_BINDINGS    32
+
 #ifdef _DEBUG
 #define gltry(function_call) \
 	function_call; \

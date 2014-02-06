@@ -6,8 +6,6 @@
 #include <classes/shader.h>
 #include <classes/texture.h>
 
-#define CUBE_MAX_BINDINGS 32
-
 struct aiMaterial;
 
 namespace CUBE {
