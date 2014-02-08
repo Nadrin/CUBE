@@ -6,15 +6,21 @@
 
 using namespace CUBE;
 
-Framebuffer::Framebuffer()
+FrameBuffer::FrameBuffer(const Dim& size, const unsigned int samples)
 {
+	assert(size.Width && size.Height);
+
+	defaultSize.Width  = size.GetWidth();
+	defaultSize.Height = size.GetHeight();
+	defaultSamples     = samples ? samples : 1;
+
 	std::memset(&targets, 0, sizeof(targets));
-	gltry(glGenFramebuffers(1, &id));
+	gltry(glGenFramebuffers(1, &fb));
 }
 
-Framebuffer::~Framebuffer()
+FrameBuffer::~FrameBuffer()
 {
-	gltry(glDeleteFramebuffers(1, &id));
+	gltry(glDeleteFramebuffers(1, &fb));
 
 	for(unsigned int i=0; i<CUBE_MAX_ATTACHMENTS; i++) {
 		if(targets.color[i].buffer) {
@@ -28,4 +34,126 @@ Framebuffer::~Framebuffer()
 	if(targets.stencil.buffer) {
 		gltry(glDeleteRenderbuffers(1, &targets.stencil.buffer));
 	}
+}
+
+Dim FrameBuffer::GetEffectiveSize(Dim* size) const
+{
+	FractDim* fd = dynamic_cast<FractDim*>(size);
+	if(fd) {
+		fd->FromBaseDim(defaultSize);
+	}
+	return Dim(size->GetWidth(), size->GetHeight());
+}
+
+unsigned int FrameBuffer::GetEffectiveSamples(const unsigned int samples) const
+{
+	return samples ? samples : defaultSamples;
+}
+
+void FrameBuffer::Attach(Attachment& attachment, const GLenum type, const Texture& texture)
+{
+	assert(!attachment);
+
+	gltry(glBindFramebuffer(GL_FRAMEBUFFER, fb));
+	gltry(glFramebufferTexture(GL_FRAMEBUFFER, type, texture.GetID(), 0));
+	gltry(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+
+	attachment.texture = &texture;
+}
+
+void FrameBuffer::Attach(Attachment& attachment, const GLenum type, const RenderBuffer& rb)
+{
+	assert(!attachment);
+
+	const Dim size = GetEffectiveSize(rb.Size);
+
+	gltry(glGenRenderbuffers(1, &attachment.buffer));
+	gltry(glBindRenderbuffer(GL_RENDERBUFFER, attachment.buffer));
+	gltry(glRenderbufferStorageMultisample(GL_RENDERBUFFER,
+		GetEffectiveSamples(rb.Samples), rb.Format, size.GetWidth(), size.GetHeight()));
+	gltry(glBindRenderbuffer(GL_RENDERBUFFER, 0));
+
+	gltry(glBindFramebuffer(GL_FRAMEBUFFER, fb));
+	gltry(glFramebufferRenderbuffer(GL_FRAMEBUFFER, type, GL_RENDERBUFFER, attachment.buffer));
+	gltry(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+}
+	
+void FrameBuffer::Detach(Attachment& attachment, const GLenum type)
+{
+	gltry(glBindFramebuffer(GL_FRAMEBUFFER, fb));
+	if(attachment.buffer) {
+		gltry(glFramebufferRenderbuffer(GL_FRAMEBUFFER, type, GL_RENDERBUFFER, 0));
+		gltry(glDeleteRenderbuffers(1, &attachment.buffer));
+	}
+	else if(attachment.texture) {
+		gltry(glFramebufferTexture(GL_FRAMEBUFFER, type, 0, 0));
+	}
+	gltry(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+
+	std::memset(&attachment, 0, sizeof(Attachment));
+}
+
+void FrameBuffer::Validate() const
+{
+	static const std::map<GLenum, std::string> statusString = {
+		{ GL_FRAMEBUFFER_UNDEFINED, "FRAMEBUFFER_UNDEFINED" },
+		{ GL_FRAMEBUFFER_UNSUPPORTED, "FRAMEBUFFER_UNSUPPORTED" },
+		{ GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT, "INCOMPLETE_ATTACHMENT" },
+		{ GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT, "INCOMPLETE_MISSING_ATTACHMENT" },
+		{ GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER, "INCOMPLETE_DRAW_BUFFER" },
+		{ GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER, "INCOMPLETE_READ_BUFFER" },
+		{ GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE, "INCOMPLETE_MULTISAMPLE" },
+		{ GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS, "INCOMPLETE_LAYER_TARGETS" },
+	};
+
+	gltry(glBindFramebuffer(GL_FRAMEBUFFER, fb));
+	GLenum status = gltry(glCheckFramebufferStatus(GL_FRAMEBUFFER));
+	gltry(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+
+	if(status != GL_FRAMEBUFFER_COMPLETE) {
+		throw std::runtime_error(std::string("FBO validation failed: ") + statusString.at(status));
+	}
+}
+
+void FrameBuffer::AttachColor(const unsigned int index, const Texture& texture)
+{
+	assert(index < CUBE_MAX_ATTACHMENTS);
+	Attach(targets.color[index], GL_COLOR_ATTACHMENT0+index, texture);
+}
+
+void FrameBuffer::AttachColor(const unsigned int index, const RenderBuffer& rb)
+{
+	assert(index < CUBE_MAX_ATTACHMENTS);
+	Attach(targets.color[index], GL_COLOR_ATTACHMENT0+index, rb);
+}
+
+void FrameBuffer::DetachColor(const unsigned int index)
+{
+	assert(index < CUBE_MAX_ATTACHMENTS);
+	Detach(targets.color[index], GL_COLOR_ATTACHMENT0+index);
+}
+
+void FrameBuffer::AttachDepth(const Texture& texture)
+{
+	Attach(targets.depth, GL_DEPTH_ATTACHMENT, texture);
+}
+
+void FrameBuffer::AttachDepth(const RenderBuffer& rb)
+{
+	Attach(targets.depth, GL_DEPTH_ATTACHMENT, rb);
+}
+
+void FrameBuffer::DetachDepth()
+{
+	Detach(targets.depth, GL_DEPTH_ATTACHMENT);
+}
+
+void FrameBuffer::AttachStencil(const RenderBuffer& rb)
+{
+	Attach(targets.stencil, GL_STENCIL_ATTACHMENT, rb);
+}
+
+void FrameBuffer::DetachStencil()
+{
+	Detach(targets.stencil, GL_STENCIL_ATTACHMENT);
 }

@@ -34,6 +34,8 @@ public:
 	virtual GLenum GetType() const;
 	virtual GLenum GetFormat() const;
 
+	inline GLuint GetID() const { return id; }
+
 	static std::string Prefix;
 
 	friend class Sampler;
