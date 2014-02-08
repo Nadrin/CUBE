@@ -23,6 +23,11 @@ struct Dim
 	virtual unsigned int GetHeight() const { return Height; }
 	virtual unsigned int GetDepth() const  { return Depth;  }
 
+	float AspectRatio() const
+	{
+		return float(GetWidth()) / float(GetHeight());
+	}
+
 	virtual Dim* Clone() const
 	{
 		return new Dim(*this);
@@ -38,8 +43,8 @@ struct ViewportDim : public Dim
 		int dispWidth, dispHeight;
 		Core::System::Instance()->GetDisplaySize(dispWidth, dispHeight);
 
-		Width  = glm::min(dispWidth / divw, unsigned int(1));
-		Height = glm::min(dispHeight / divh, unsigned int(1));
+		Width  = glm::max(dispWidth / divw, unsigned int(1));
+		Height = glm::max(dispHeight / divh, unsigned int(1));
 		Depth  = 1;
 	}
 	ViewportDim(const ViewportDim& other) : Dim(other) {}

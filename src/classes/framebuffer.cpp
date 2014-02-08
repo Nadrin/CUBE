@@ -50,6 +50,16 @@ unsigned int FrameBuffer::GetEffectiveSamples(const unsigned int samples) const
 	return samples ? samples : defaultSamples;
 }
 
+unsigned int FrameBuffer::GetRelevantAttachments(GLenum* buffer) const
+{
+	unsigned int numAttachments = 0;
+	for(unsigned int i=0; i<CUBE_MAX_ATTACHMENTS; i++) {
+		if(targets.color[i])
+			buffer[numAttachments++] = GL_COLOR_ATTACHMENT0 + i;
+	}
+	return numAttachments;
+}
+
 void FrameBuffer::Attach(Attachment& attachment, const GLenum type, const Texture& texture)
 {
 	assert(!attachment);
@@ -92,6 +102,7 @@ void FrameBuffer::Detach(Attachment& attachment, const GLenum type)
 
 	std::memset(&attachment, 0, sizeof(Attachment));
 }
+
 
 void FrameBuffer::Validate() const
 {
@@ -156,4 +167,83 @@ void FrameBuffer::AttachStencil(const RenderBuffer& rb)
 void FrameBuffer::DetachStencil()
 {
 	Detach(targets.stencil, GL_STENCIL_ATTACHMENT);
+}
+
+bool FrameBuffer::IsActiveDraw() const
+{
+	return DrawFrameBuffer::Stack.Current() && DrawFrameBuffer::Stack.Current()->InstanceOf(this);
+}
+
+bool FrameBuffer::IsActiveRead() const
+{
+	return ReadFrameBuffer::Stack.Current() && ReadFrameBuffer::Stack.Current()->InstanceOf(this);
+}
+
+FrameBuffer* FrameBuffer::CurrentDraw()
+{
+	if(DrawFrameBuffer::Stack.Current())
+		return DrawFrameBuffer::Stack.Current()->ptr();
+	return nullptr;
+}
+
+FrameBuffer* FrameBuffer::CurrentRead()
+{
+	if(ReadFrameBuffer::Stack.Current())
+		return ReadFrameBuffer::Stack.Current()->ptr();
+	return nullptr;
+}
+
+CUBE_STACK(DrawFrameBuffer);
+CUBE_STACK(ReadFrameBuffer);
+
+DrawFrameBuffer::DrawFrameBuffer(FrameBuffer& fb) : ActiveObject(fb)
+{
+	CUBE_PUSH;
+
+	GLenum attachments[CUBE_MAX_ATTACHMENTS];
+	unsigned int numAttachments = fb.GetRelevantAttachments(attachments);
+	assert(numAttachments > 0);
+
+	gltry(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fb.fb));
+	gltry(glDrawBuffers(numAttachments, attachments));
+}
+
+DrawFrameBuffer::~DrawFrameBuffer()
+{
+	gltry(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0));
+	CUBE_POP;
+}
+
+ReadFrameBuffer::ReadFrameBuffer(FrameBuffer& fb) : ActiveObject(fb)
+{
+	CUBE_PUSH;
+
+	GLenum attachments[CUBE_MAX_ATTACHMENTS];
+	assert(fb.GetRelevantAttachments(attachments) > 0);
+
+	gltry(glBindFramebuffer(GL_READ_FRAMEBUFFER, fb.fb));
+	gltry(glReadBuffer(attachments[0]));
+}
+
+ReadFrameBuffer::~ReadFrameBuffer()
+{
+	gltry(glBindFramebuffer(GL_READ_FRAMEBUFFER, 0));
+	CUBE_POP;
+}
+
+void ReadFrameBuffer::Blit(const GLbitfield mask, const GLenum filter) const
+{
+	const Dim& size    = objectPtr->defaultSize;
+	const GLint rect[] = { 0, 0, size.GetWidth()-1, size.GetHeight()-1 };
+
+	gltry(glBlitFramebuffer(
+		rect[0], rect[1], rect[2], rect[3],
+		rect[0], rect[1], rect[2], rect[3],
+		mask, filter));
+}
+
+void ReadFrameBuffer::Blit(FrameBuffer& other, const GLbitfield mask, const GLenum filter) const
+{
+	DrawFrameBuffer drawfb(other);
+	Blit(mask, filter);
 }

@@ -17,7 +17,7 @@ mat4& CameraActor::Perspective(const float fov, const float zNear, const float z
 {
 	ViewportDim viewport;
 
-	projectionMatrix = glm::perspectiveFov(fov, float(viewport.Width), float(viewport.Height), zNear, zFar);
+	projectionMatrix = glm::perspective(fov, viewport.AspectRatio(), zNear, zFar);
 	return projectionMatrix;
 }
 

@@ -51,6 +51,7 @@ protected:
 protected:
 	Dim          GetEffectiveSize(Dim* size) const;
 	unsigned int GetEffectiveSamples(const unsigned int samples) const;
+	unsigned int GetRelevantAttachments(GLenum* buffer) const;
 
 	void Attach(Attachment& attachment, const GLenum type, const Texture& texture);
 	void Attach(Attachment& attachment, const GLenum type, const RenderBuffer& rb);
@@ -58,6 +59,8 @@ protected:
 public:
 	FrameBuffer(const Dim& size, const unsigned int samples=0);
 	virtual ~FrameBuffer();
+
+	inline GLuint GetID() const { return fb; }
 
 	void AttachColor(const unsigned int index, const Texture& texture);
 	void AttachColor(const unsigned int index, const RenderBuffer& rb);
@@ -71,6 +74,36 @@ public:
 	void DetachStencil();
 
 	void Validate() const;
+
+	bool IsActiveRead() const;
+	bool IsActiveDraw() const;
+
+	static FrameBuffer* CurrentRead();
+	static FrameBuffer* CurrentDraw();
+
+	friend class DrawFrameBuffer;
+	friend class ReadFrameBuffer;
+};
+
+class DrawFrameBuffer : public ActiveObject<FrameBuffer>
+{
+public:
+	DrawFrameBuffer(FrameBuffer& fb);
+	~DrawFrameBuffer();
+
+	CUBE_DECLSTACK(DrawFrameBuffer);
+};
+
+class ReadFrameBuffer : public ActiveObject<FrameBuffer>
+{
+public:
+	ReadFrameBuffer(FrameBuffer& fb);
+	~ReadFrameBuffer();
+
+	void Blit(const GLbitfield mask, const GLenum filter=GL_NEAREST) const;
+	void Blit(FrameBuffer& other, const GLbitfield mask, const GLenum filter=GL_NEAREST) const;
+
+	CUBE_DECLSTACK(ReadFrameBuffer);
 };
 
 } // CUBE
