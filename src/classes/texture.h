@@ -18,21 +18,24 @@ public:
 		MaxChannels,
 	};
 protected:
-	Dim  size;
-	int  components;
-	bool isHDR;
+	Dim    size;
+	GLenum format;
+	GLenum type;
+	int    samples;
 
 	GLuint id;
 protected:
-	void InitResource(const ILubyte* pixels);
+	void InitResource(const int components, const ILubyte* pixels);
 public:
-	Texture(const Dim& dim, const int comp, bool hdr=false);
-	Texture(const std::string& path, bool forceHdr=false);
+	Texture(const Dim& dim, const GLenum format, const GLenum type=GL_UNSIGNED_BYTE);
+	Texture(const Dim& dim, const int samples, const GLenum format, const GLenum type=GL_UNSIGNED_BYTE);
+	Texture(const std::string& path, const GLenum overrideType=GL_NONE);
 	virtual ~Texture();
 
-	virtual GLenum GetTarget() const;
-	virtual GLenum GetType() const;
-	virtual GLenum GetFormat() const;
+	GLenum GetTarget() const;
+
+	GLenum GetType() const    { return type;   }
+	GLenum GetFormat() const  { return format; }
 
 	inline GLuint GetID() const { return id; }
 

@@ -8,15 +8,24 @@ using namespace CUBE;
 
 std::string Texture::Prefix("textures\\");
 
-Texture::Texture(const Dim& dim, const int comp, bool hdr)
-	: size(dim), components(comp), isHDR(hdr)
+Texture::Texture(const Dim& dim, const GLenum format, const GLenum type)
+	: size(dim), samples(1), format(format), type(type)
 {
-	InitResource(nullptr);
+	InitResource(0, nullptr);
 }
 
-Texture::Texture(const std::string& path, bool forceHdr)
+Texture::Texture(const Dim& dim, const int samples, const GLenum format, const GLenum type)
+	: size(dim), samples(samples), format(format), type(type)
 {
+	assert(samples > 0);
+	assert(samples == 1 || (dim.GetHeight() >= 1 && dim.GetDepth() == 1));
 
+	InitResource(0, nullptr);
+}
+
+Texture::Texture(const std::string& path, const GLenum overrideType)
+	: samples(1)
+{
 	ILuint image;
 	ilGenImages(1, &image);
 	ilBindImage(image);
@@ -28,7 +37,8 @@ Texture::Texture(const std::string& path, bool forceHdr)
 		throw std::runtime_error("Failed to load texture image file: " + fp);
 	}
 
-	components  = ilGetInteger(IL_IMAGE_CHANNELS);
+	int components = ilGetInteger(IL_IMAGE_CHANNELS);
+
 	size.Width  = ilGetInteger(IL_IMAGE_WIDTH);
 	size.Height = ilGetInteger(IL_IMAGE_HEIGHT);
 	size.Depth  = ilGetInteger(IL_IMAGE_DEPTH);
@@ -39,7 +49,7 @@ Texture::Texture(const std::string& path, bool forceHdr)
 
 		bool convNeeded = false;
 
-		if(forceHdr) {
+		if(overrideType == GL_FLOAT) {
 			if(type != IL_FLOAT) {
 				convNeeded = true;
 				type       = IL_FLOAT;
@@ -49,7 +59,6 @@ Texture::Texture(const std::string& path, bool forceHdr)
 			convNeeded = true;
 			type       = IL_UNSIGNED_BYTE;
 		}
-		isHDR = (type == IL_FLOAT);
 
 		if(format != IL_RGB && format != IL_RGBA && format != IL_LUMINANCE) {
 			convNeeded = true;
@@ -68,9 +77,11 @@ Texture::Texture(const std::string& path, bool forceHdr)
 				throw std::runtime_error("Failed to convert texture image into suitable format: " + fp);
 			}
 		}
+
+		this->type = (type == IL_FLOAT) ? GL_FLOAT : GL_UNSIGNED_BYTE;
 	}
 
-	InitResource(ilGetData());
+	InitResource(components, ilGetData());
 	ilDeleteImages(1, &image);
 }
 
@@ -85,47 +96,22 @@ GLenum Texture::GetTarget() const
 	if(size.Height == 1 && size.Depth == 1)
 		return GL_TEXTURE_1D;
 	else if(size.Depth == 1)
-		return GL_TEXTURE_2D;
+		return samples > 1 ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
 	else
 		return GL_TEXTURE_3D;
 }
 
-GLenum Texture::GetType() const
+void Texture::InitResource(const int components, const ILubyte* pixels)
 {
-	if(isHDR)
-		return GL_FLOAT;
-	else
-		return GL_UNSIGNED_BYTE;
-}
-
-GLenum Texture::GetFormat() const
-{
-	switch(components) {
-	case 1:
-		return GL_RED;
-	case 2:
-		return GL_RG;
-	case 3:
-		return GL_RGB;
-	case 4:
-		return GL_RGBA;
-	}
-
-	assert(0);
-	return 0;
-}
-
-void Texture::InitResource(const ILubyte* pixels)
-{
-	assert(components == 1 
-		|| components == 3 
-		|| components == 4);
-
-	gltry(glGenTextures(1, &id));
+	assert(components >= 0 && components <= 4);
+	static const GLenum formatLUT[] = { GL_INVALID_ENUM, GL_RED, GL_RG, GL_RGB, GL_RGBA };
 
 	GLenum target = GetTarget();
-	GLenum format = GetFormat();
 
+	if(components > 0)
+		format = formatLUT[components];
+	
+	gltry(glGenTextures(1, &id));
 	gltry(glActiveTexture(GL_TEXTURE0));
 	gltry(glBindTexture(target, id));
 
@@ -135,6 +121,9 @@ void Texture::InitResource(const ILubyte* pixels)
 		break;
 	case GL_TEXTURE_2D:
 		gltry(glTexImage2D(target, 0, format, size.Width, size.Height, 0, format, GetType(), pixels));
+		break;
+	case GL_TEXTURE_2D_MULTISAMPLE:
+		gltry(glTexImage2DMultisample(target, samples, format, size.Width, size.Height, GL_FALSE));
 		break;
 	case GL_TEXTURE_3D:
 		gltry(glTexImage3D(target, 0, format, size.Width, size.Height, size.Depth, 0, format, GetType(), pixels));
