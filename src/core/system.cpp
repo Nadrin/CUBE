@@ -90,22 +90,25 @@ void System::KeyCallback(GLFWwindow* window, int key, int scancode, int action, 
 #endif
 }
 
-void System::UpdateDebugInfo()
+void System::UpdateDebugInfo(const GLuint64 frameTime)
 {
 	static double lastTime = 0.0;
 	double time = glfwGetTime();
 
-	if((time - lastTime) >= 0.1) {
-		char debugInfo[256];
+	if((time - lastTime) >= CUBE_DEBUG_PRINTFREQ) {
+		const double frameTimeMS = frameTime / 1000000.0;
+		const double FPS = 1000.0 / frameTimeMS;
 
 		std::string sceneName;
 		if(!DebugInfo.SceneName.empty())
-			sceneName = DebugInfo.SceneName + ": ";
+			sceneName = DebugInfo.SceneName + ", ";
+
+		char debugInfo[256];
+		sprintf_s(debugInfo, "%s [ %sT: %05.1fs, dT: %03.0fms, FPS: %02.1f ] %s", name,
+			sceneName.c_str(), System::GetTime(), frameTimeMS, FPS, paused?"(paused)":"");
+		glfwSetWindowTitle(window, debugInfo);
 
 		lastTime = time;
-		sprintf_s(debugInfo, "%s [ %s%05.1fs ] %s", name,
-			sceneName.c_str(), System::GetTime(), paused?"(paused)":"");
-		glfwSetWindowTitle(window, debugInfo);
 	}
 }
 
@@ -159,6 +162,7 @@ void System::Terminate()
 	System::Log("CUBE demo toolkit terminated.\n");
 
 #ifdef _DEBUG
+	glDeleteQueries(1, &DebugInfo.frameTimeQuery);
 	Assimp::DefaultLogger::kill();
 	FreeConsole();
 #endif
@@ -209,6 +213,7 @@ void System::OpenDisplay(const int width, const int height, bool fullscreen)
 #ifdef _DEBUG
 	System::UI = new Core::TweakBarUI(window, width, height);
 	System::Log("Debug GUI initialized.\n");
+	glGenQueries(1, &DebugInfo.frameTimeQuery);
 #else
 	System::UI = new Core::NullUI();
 #endif
@@ -235,15 +240,21 @@ void System::Run(RenderBlock renderFunction)
 	BASS_ChannelPlay(stream, TRUE);
 
 	while(!glfwWindowShouldClose(window)) {
-		if(!renderFunction(GetTime())) 
-			break;
-
+		glBeginQuery(GL_TIME_ELAPSED, DebugInfo.frameTimeQuery);
+		if(!renderFunction(GetTime()))
+			glfwSetWindowShouldClose(window, true);
 		UI->Draw();
+		glEndQuery(GL_TIME_ELAPSED);
+
 #ifdef _DEBUG
-		System::UpdateDebugInfo();
+		GLuint64 frameTime;
+		glGetQueryObjectui64v(DebugInfo.frameTimeQuery, GL_QUERY_RESULT, &frameTime);
+
+		System::UpdateDebugInfo(frameTime);
 		if(NotifyService)
 			NotifyService->ProcessEvents();
 #endif
+
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}

@@ -31,12 +31,13 @@ private:
 	 } ScreenQuad;
 
 	 mutable struct {
-		std::string SceneName;
+		 GLuint frameTimeQuery;
+		 std::string SceneName;
 	 } DebugInfo;
 
 	 System();
 private:
-	 void UpdateDebugInfo();
+	 void UpdateDebugInfo(const GLuint64 frameTime);
 	 void SetDefaults();
 
 	 void CreateScreenQuadVAO();

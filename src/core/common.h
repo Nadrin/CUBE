@@ -2,6 +2,8 @@
 
 #pragma once
 
+#define CUBE_DEBUG_PRINTFREQ 0.1
+
 #define CUBE_MAX_ATTACHMENTS 16
 #define CUBE_MAX_BINDINGS    32
 
