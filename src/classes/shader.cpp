@@ -125,13 +125,13 @@ GLuint Shader::CompileShader(GLenum type)
 		gltry(glShaderSource(shader, 1, inSource, inLength));
 	}
 
-	Core::System::Instance()->Log("Compiling shader: %s\n", filename.c_str());
+	CUBE_LOG("Compiling shader: %s\n", filename.c_str());
 	gltry(glCompileShader(shader));
 #ifdef _DEBUG
 	{
 		std::string infoLog(GetInfoLog(shader, type));
 		if(infoLog.find_first_not_of(" \t\n\r") != std::string::npos)
-			Core::System::Instance()->Log("\n%s\n", infoLog.c_str());
+			CUBE_LOG("\n%s\n", infoLog.c_str());
 	}
 #endif
 
@@ -150,7 +150,7 @@ GLuint Shader::CompileShader(GLenum type)
 
 bool Shader::ReloadShader(GLenum type, GLuint& id)
 {
-	Core::System::Instance()->Log("Received shader reload notification.\n");
+	CUBE_LOG("Received shader reload notification.\n");
 	
 	GLuint newId;
 	try {
@@ -159,7 +159,7 @@ bool Shader::ReloadShader(GLenum type, GLuint& id)
 			throw std::runtime_error("Cannot read shader source file.");
 	}
 	catch(std::runtime_error& error) {
-		Core::System::Instance()->Log("Reload failed: %s\n", error.what());
+		CUBE_LOG("Reload failed: %s\n", error.what());
 		return false;
 	}
 
@@ -185,7 +185,7 @@ void Shader::DeleteShader(GLenum type, GLuint& id)
 
 void Shader::LinkProgram()
 {
-	Core::System::Instance()->Log("Linking shader program: %s\n", path.c_str());
+	CUBE_LOG("Linking shader program: %s\n", path.c_str());
 	gltry(glLinkProgram(program));
 
 	GLint status;
@@ -200,7 +200,7 @@ void Shader::LinkProgram()
 	{
 		std::string infoLog(GetInfoLog(program, GL_PROGRAM));
 		if(infoLog.find_first_not_of(" \t\n\r") != std::string::npos)
-			Core::System::Instance()->Log("\n%s\n", infoLog.c_str());
+			CUBE_LOG("\n%s\n", infoLog.c_str());
 	}
 #endif
 
@@ -246,7 +246,7 @@ void Shader::NotifyHandler::operator()(const std::string& filename)
 			shader->ReloadShader(GL_GEOMETRY_SHADER, shader->gs);
 	}
 	else {
-		Core::System::Instance()->Log("Warning: Received shader reload event for unknown filename: %s\n", filename.c_str());
+		CUBE_LOG("Warning: Received shader reload event for unknown filename: %s\n", filename.c_str());
 	}
 }
 
@@ -286,7 +286,7 @@ void Shader::ValidateUniforms()
 		GLint location = gltry(glGetUniformLocation(program, it->first.c_str()));
 
 		if(location == -1) {
-			Core::System::Instance()->Log("Warning: Removed shader uniform %s::%s\n", name.c_str(), it->first.c_str());
+			CUBE_LOG("Warning: Removed shader uniform %s::%s\n", name.c_str(), it->first.c_str());
 			uniformCache.erase(it++);
 		}
 		else {

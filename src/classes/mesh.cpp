@@ -116,7 +116,7 @@ Mesh::Mesh(const Flags hints) : hints(hints)
 Mesh::Mesh(const std::string& fp, const Flags hints)
 	: path(Prefix+fp), hints(hints)
 {
-	Core::System::Instance()->Log("Loading mesh file: %s\n", path.c_str());
+	CUBE_LOG("Loading mesh file: %s\n", path.c_str());
 
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(path.c_str(), GetImportFlags());

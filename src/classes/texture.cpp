@@ -31,7 +31,7 @@ Texture::Texture(const std::string& path, const GLenum overrideType)
 	ilBindImage(image);
 
 	const std::string fp(Prefix+path);
-	Core::System::Instance()->Log("Loading texture file: %s\n", fp.c_str());
+	CUBE_LOG("Loading texture file: %s\n", fp.c_str());
 	if(!ilLoadImage(fp.c_str())) {
 		ilDeleteImages(1, &image);
 		throw std::runtime_error("Failed to load texture image file: " + fp);
