@@ -395,6 +395,13 @@ void System::SetDefaults()
 	/* OpenIL setup */
 	ilEnable(IL_ORIGIN_SET);
 	ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
+
+	/* Viewport */
+	int viewWidth, viewHeight;
+	glfwGetFramebufferSize(window, &viewWidth, &viewHeight);
+
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glViewport(0, 0, viewWidth, viewHeight);
 }
 
 void System::CreateScreenQuadVAO()

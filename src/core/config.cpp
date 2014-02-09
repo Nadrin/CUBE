@@ -39,6 +39,9 @@ bool Config::Read(const std::string& filename)
 		std::string line, ident, value;
 		std::getline(file, line);
 
+		if(line.length() == 0 || line.at(0) == '#')
+			continue;
+
 		std::stringstream sline(line);
 		if(!std::getline(sline, ident, '=') || ident.empty())
 			continue;

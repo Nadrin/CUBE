@@ -219,11 +219,10 @@ DrawFrameBuffer::DrawFrameBuffer(FrameBuffer& fb) : ActiveObject(fb)
 
 DrawFrameBuffer::~DrawFrameBuffer()
 {
-	int dispWidth, dispHeight;
-	Core::System::Instance()->GetDisplaySize(dispWidth, dispHeight);
+	ViewportDim viewport;
 
 	gltry(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0));
-	gltry(glViewport(0, 0, dispWidth, dispHeight));
+	gltry(glViewport(0, 0, viewport.GetWidth(), viewport.GetHeight()));
 	CUBE_POP;
 }
 

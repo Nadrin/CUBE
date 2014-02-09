@@ -104,11 +104,11 @@ GLuint SubMesh::CreateIndexBuffer(const aiFace* data) const
 	return ibo;
 }
 
-Mesh::Mesh(Hint hint) : isWithMaterials(hint == Hint::WithMaterials)
+Mesh::Mesh(const Flags hints) : hints(hints)
 {}
 
-Mesh::Mesh(const std::string& fp, Hint hint)
-	: path(Prefix+fp), isWithMaterials(hint == Hint::WithMaterials)
+Mesh::Mesh(const std::string& fp, const Flags hints)
+	: path(Prefix+fp), hints(hints)
 {
 	Core::System::Instance()->Log("Loading mesh file: %s\n", path.c_str());
 
@@ -146,7 +146,7 @@ void Mesh::InitResource(const aiScene* scene)
 	if(subMeshes.size() == 0)
 		throw std::runtime_error("No suitable mesh data found in: " + path);
 
-	if(!isWithMaterials)
+	if(!(hints & Hint::WithMaterials))
 		return;
 
 	for(unsigned int i=0; i<scene->mNumMaterials; i++) {
@@ -184,18 +184,22 @@ void Mesh::InitTexture(StdMaterial* material, const aiMaterial* source, Texture:
 }
 
 
-unsigned int Mesh::GetImportFlags() const
+Flags Mesh::GetImportFlags() const
 {
-	unsigned int flags = 
+	Flags flags = 
 		aiProcess_CalcTangentSpace |
 		aiProcess_Triangulate |
-		aiProcess_GenNormals |
 		aiProcess_PreTransformVertices |
 		aiProcess_RemoveRedundantMaterials |
 		aiProcess_FixInfacingNormals |
 		aiProcess_SortByPType |
 		aiProcess_GenUVCoords |
 		aiProcess_TransformUVCoords;
+
+	if(hints & Hint::FlatNormals)
+		flags |= aiProcess_GenNormals;
+	else
+		flags |= aiProcess_GenSmoothNormals;
 
 #ifdef _DEBUG
 	flags |=
@@ -224,7 +228,7 @@ unsigned int Mesh::GetFaceCount() const
 	return ret;
 }
 
-Shape::Shape(const std::string& desc) : Mesh()
+Shape::Shape(const std::string& desc, const Flags hints) : Mesh(hints)
 {
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFileFromMemory(desc.c_str(), desc.length(), GetImportFlags(), "nff");
@@ -259,7 +263,7 @@ void MeshActor::Draw(Shader& shader)
 {
 	shader.SetModelMatrix(transform());
 
-	if(mesh->isWithMaterials)
+	if(mesh->hints & Hint::WithMaterials)
 		DrawWithMaterials(shader);
 	else
 		DrawDefault(shader);

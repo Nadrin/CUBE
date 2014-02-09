@@ -57,7 +57,7 @@ class Mesh
 {
 protected:
 	const std::string path;
-	const bool isWithMaterials;
+	const Flags hints;
 
 	std::vector<SubMesh*>     subMeshes;
 	std::vector<StdMaterial*> materials;
@@ -65,14 +65,14 @@ protected:
 	std::list<std::shared_ptr<Texture>> textureRef;
 	Cache<std::string, Texture>         textureCache;
 protected:
-	Mesh(Hint hint=Hint::Defaults);
+	Mesh(const Flags hints=Hint::Defaults);
 
 	void InitResource(const aiScene* scene);
 	void InitTexture(StdMaterial* material, const aiMaterial* source, Texture::Channel channel);
 
-	virtual unsigned int GetImportFlags() const;
+	virtual Flags GetImportFlags() const;
 public:
-	Mesh(const std::string& fp, Hint=Hint::Defaults);
+	Mesh(const std::string& fp, const Flags hints=Hint::Defaults);
 	Mesh(const Mesh& other) = delete;
 	virtual ~Mesh();
 
@@ -90,19 +90,24 @@ public:
 class Shape : public Mesh
 {
 public:
-	Shape(const std::string& desc);
+	Shape(const std::string& desc, const Flags hints=Hint::Defaults);
 	Shape(const Shape& other) = delete;
 	virtual ~Shape() {}
 };
 
 struct CubeShape : public Shape
 {
-	CubeShape(float size) : Shape("hex 0 0 0 " + std::to_string(size)) {}
+	CubeShape(float size=1.0f) : Shape("hex 0 0 0 " + std::to_string(size), Hint::FlatNormals) {}
 };
 
 struct SphereShape : public Shape
 {
-	SphereShape(float radius) : Shape("s 0 0 0 " + std::to_string(radius)) {}
+	SphereShape(float radius=1.0f) : Shape("s 0 0 0 " + std::to_string(radius)) {}
+};
+
+struct PlaneShape : public Shape
+{
+	PlaneShape() : Shape("p 4\n1 0 -1\n1 0 1\n-1 0 1\n-1 0 -1", Hint::FlatNormals) {}
 };
 
 class MeshActor : public Actor

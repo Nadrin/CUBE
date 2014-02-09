@@ -21,11 +21,17 @@ using vec4 = glm::vec4;
 using mat4 = glm::mat4x4;
 using quat = glm::fquat;
 
-enum class Hint
+typedef unsigned int Flags;
+
+namespace Hint
 {
-	Defaults,
-	WithMaterials,
-};
+	enum Type
+	{
+		Defaults      = 0x00,
+		WithMaterials = 0x01,
+		FlatNormals   = 0x02,
+	};
+}
 
 struct BlendFunc
 {
