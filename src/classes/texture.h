@@ -27,8 +27,8 @@ protected:
 protected:
 	void InitResource(const int components, const ILubyte* pixels);
 public:
-	Texture(const Dim& dim, const GLenum format, const GLenum type=GL_UNSIGNED_BYTE);
-	Texture(const Dim& dim, const int samples, const GLenum format, const GLenum type=GL_UNSIGNED_BYTE);
+	Texture(const Dim& dim, const GLenum format, const GLenum type);
+	Texture(const Dim& dim, const int samples, const GLenum format, const GLenum type);
 	Texture(const std::string& path, const GLenum overrideType=GL_NONE);
 	virtual ~Texture();
 

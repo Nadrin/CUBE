@@ -35,7 +35,7 @@ protected:
 	unsigned int defaultSamples;
 
 	struct Attachment {
-		const Texture* texture;
+		Texture* texture;
 		GLuint buffer;
 
 		operator bool() const
@@ -53,7 +53,7 @@ protected:
 	unsigned int GetEffectiveSamples(const unsigned int samples) const;
 	unsigned int GetRelevantAttachments(GLenum* buffer) const;
 
-	void Attach(Attachment& attachment, const GLenum type, const Texture& texture);
+	void Attach(Attachment& attachment, const GLenum type, Texture& texture);
 	void Attach(Attachment& attachment, const GLenum type, const RenderBuffer& rb);
 	void Detach(Attachment& attachment, const GLenum type);
 public:
@@ -62,11 +62,11 @@ public:
 
 	inline GLuint GetID() const { return fb; }
 
-	void AttachColor(const unsigned int index, const Texture& texture);
+	void AttachColor(const unsigned int index, Texture& texture);
 	void AttachColor(const unsigned int index, const RenderBuffer& rb);
 	void DetachColor(const unsigned int index);
 
-	void AttachDepth(const Texture& texture);
+	void AttachDepth(Texture& texture);
 	void AttachDepth(const RenderBuffer& rb);
 	void DetachDepth();
 
@@ -80,6 +80,16 @@ public:
 
 	static FrameBuffer* CurrentRead();
 	static FrameBuffer* CurrentDraw();
+
+	Texture& GetColorTexture(const unsigned int index) const
+	{
+		assert(index < CUBE_MAX_ATTACHMENTS);
+		return *targets.color[index].texture;
+	}
+	Texture& GetDepthTexture() const
+	{
+		return *targets.depth.texture;
+	}
 
 	friend class DrawFrameBuffer;
 	friend class ReadFrameBuffer;

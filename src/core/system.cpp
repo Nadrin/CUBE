@@ -153,7 +153,9 @@ void System::Terminate()
 	delete CUBE::UI;
 	delete CUBE::Config;
 
+	DeleteScreenQuadVAO();
 	glfwTerminate();
+
 	System::Log("CUBE demo toolkit terminated.\n");
 
 #ifdef _DEBUG
@@ -215,6 +217,7 @@ void System::OpenDisplay(const int width, const int height, bool fullscreen)
 
 	ClearErrorGL();
 	SetDefaults();
+	CreateScreenQuadVAO();
 }
 
 void System::SetName(const char* name)
@@ -392,4 +395,42 @@ void System::SetDefaults()
 	/* OpenIL setup */
 	ilEnable(IL_ORIGIN_SET);
 	ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
+}
+
+void System::CreateScreenQuadVAO()
+{
+	const GLchar vertexData[] = {
+		 1,  1, 1, 1,
+		-1,  1, 0, 1,
+		 1, -1, 1, 0,
+		-1, -1, 0, 0,
+	};
+
+	gltry(glGenVertexArrays(1, &ScreenQuad.vao));
+	gltry(glBindVertexArray(ScreenQuad.vao));
+
+	gltry(glGenBuffers(1, &ScreenQuad.vbo));
+	gltry(glBindBuffer(GL_ARRAY_BUFFER, ScreenQuad.vbo));
+	gltry(glBufferData(GL_ARRAY_BUFFER, sizeof(vertexData), vertexData, GL_STATIC_DRAW));
+
+	gltry(glVertexAttribPointer(0, 2, GL_BYTE, GL_FALSE, 4, (const GLvoid*)0));
+	gltry(glVertexAttribPointer(1, 2, GL_BYTE, GL_FALSE, 4, (const GLvoid*)2));
+	gltry(glEnableVertexAttribArray(0));
+	gltry(glEnableVertexAttribArray(1));
+
+	gltry(glBindVertexArray(0));
+	gltry(glBindBuffer(GL_ARRAY_BUFFER, 0));
+}
+
+void System::DeleteScreenQuadVAO()
+{
+	gltry(glDeleteVertexArrays(1, &ScreenQuad.vao));
+	gltry(glDeleteBuffers(1, &ScreenQuad.vbo));
+}
+
+void System::DrawScreenQuad() const
+{
+	gltry(glBindVertexArray(ScreenQuad.vao));
+	gltry(glDrawArrays(GL_TRIANGLE_STRIP, 0, 4));
+	gltry(glBindVertexArray(0));
 }

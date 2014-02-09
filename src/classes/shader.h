@@ -8,6 +8,9 @@
 
 namespace CUBE {
 
+class Texture;
+class FrameBuffer;
+
 class Shader
 {
 public:
@@ -34,8 +37,10 @@ protected:
 		virtual void operator()(const std::string& filename) override;
 	} notifyHandler;
 protected:
-	std::string GetShaderFilename(GLenum type) const;
+	virtual std::string GetShaderFilename(GLenum type) const;
 	std::string GetInfoLog(const GLuint id, GLenum type) const;
+
+	Shader();
 
 	GLuint CompileShader(GLenum type);
 	bool   ReloadShader(GLenum type, GLuint& id);
@@ -66,6 +71,21 @@ public:
 
 	friend Shader::NotifyHandler;
 	friend class ActiveShader;
+};
+
+class ImageShader : public Shader
+{
+protected:
+	virtual std::string GetShaderFilename(GLenum type) const override;
+public:
+	ImageShader(const std::string& path);
+	ImageShader(const ImageShader& other) = delete;
+
+	void Draw(const BlendFunc& blendFunc=BlendFunc());
+	void Draw(Texture& input, const BlendFunc& blendFunc=BlendFunc());
+	void Draw(Texture& input, FrameBuffer& output, const BlendFunc& blendFunc=BlendFunc());
+
+	static std::string VertexShaderName;
 };
 
 class ActiveShader : public ActiveObject<Shader>

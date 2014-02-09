@@ -25,6 +25,11 @@ private:
 	 HSTREAM     stream;
 	 std::string contentDirectory;
 
+	 struct {
+		 GLuint vao;
+		 GLuint vbo;
+	 } ScreenQuad;
+
 	 mutable struct {
 		std::string SceneName;
 	 } DebugInfo;
@@ -33,6 +38,9 @@ private:
 private:
 	 void UpdateDebugInfo();
 	 void SetDefaults();
+
+	 void CreateScreenQuadVAO();
+	 void DeleteScreenQuadVAO();
 
 	 static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 public:
@@ -61,6 +69,8 @@ public:
 	 void  TogglePlayback();
 	 void  ToggleUI();
 	 void  ArrangeUI(PlacementMode placement);
+
+	 void  DrawScreenQuad() const;
 
 	 void  Run(RenderBlock renderFunction);
 

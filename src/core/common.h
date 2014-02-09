@@ -27,6 +27,18 @@ enum class Hint
 	WithMaterials,
 };
 
+struct BlendFunc
+{
+	GLenum SourceFactor;
+	GLenum DestFactor;
+
+	BlendFunc(const GLenum src=GL_SRC_ALPHA, const GLenum dst=GL_ONE_MINUS_SRC_ALPHA)
+	{
+		SourceFactor = src;
+		DestFactor   = dst;
+	}
+};
+
 template<class T>
 class ActiveObject
 {

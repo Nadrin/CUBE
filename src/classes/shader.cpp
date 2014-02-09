@@ -6,10 +6,20 @@
 #include <utils/parameter.h>
 
 #include <classes/shader.h>
+#include <classes/texture.h>
+#include <classes/framebuffer.h>
 
 using namespace CUBE;
 
 std::string Shader::Prefix("shaders\\");
+std::string ImageShader::VertexShaderName("image");
+
+Shader::Shader()
+	: notifyHandler(this), nullUniform(this),
+	  vs(0), fs(0), gs(0)
+{
+	program = gltry(glCreateProgram());
+}
 
 Shader::Shader(const std::string& path) 
 	: name(path), path(Prefix+path), notifyHandler(this), nullUniform(this),
@@ -33,6 +43,20 @@ Shader::~Shader()
 	DeleteProgram();
 }
 
+ImageShader::ImageShader(const std::string& path) : Shader()
+{
+	this->name = path;
+	this->path = Prefix+path;
+
+	vs = CompileShader(GL_VERTEX_SHADER);
+	fs = CompileShader(GL_FRAGMENT_SHADER);
+
+	if(vs) gltry(glAttachShader(program, vs));
+	if(fs) gltry(glAttachShader(program, fs));
+
+	LinkProgram();
+}
+
 std::string Shader::GetShaderFilename(GLenum type) const
 {
 	switch(type) {
@@ -42,8 +66,23 @@ std::string Shader::GetShaderFilename(GLenum type) const
 		return path+"_fs.glsl";
 	case GL_GEOMETRY_SHADER:
 		return path+"_gs.glsl";
+	default:
+		assert(0);
 	}
-	throw std::runtime_error("GetShaderFilename: Unsupported shader type!");
+	return std::string();
+}
+
+std::string ImageShader::GetShaderFilename(GLenum type) const
+{
+	switch(type) {
+	case GL_VERTEX_SHADER:
+		return Prefix+VertexShaderName+"_vs.glsl";
+	case GL_FRAGMENT_SHADER:
+		return path+"_fs.glsl";
+	default:
+		assert(0);
+	}
+	return std::string();
 }
 
 std::string Shader::GetInfoLog(const GLuint id, GLenum type) const
@@ -336,6 +375,39 @@ Shader* Shader::Current()
 	if(ActiveShader::Stack.Current())
 		return ActiveShader::Stack.Current()->ptr();
 	return nullptr;
+}
+
+void ImageShader::Draw(const BlendFunc& blendFunc)
+{
+	const GLboolean blendingEnabled = glIsEnabled(GL_BLEND);
+
+	if(!blendingEnabled) {
+		gltry(glEnable(GL_BLEND));
+	}
+	gltry(glBlendFunc(blendFunc.SourceFactor, blendFunc.DestFactor));
+	
+	{
+		ActiveShader shader(*this);
+		Core::System::Instance()->DrawScreenQuad();
+	}
+
+	gltry(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+	if(!blendingEnabled) {
+		gltry(glDisable(GL_BLEND));
+	}
+}
+
+void ImageShader::Draw(Texture& input, const BlendFunc& blendFunc)
+{
+	ActiveTexture texture(0, input);
+	Draw(blendFunc);
+}
+
+void ImageShader::Draw(Texture& input, FrameBuffer& output, const BlendFunc& blendFunc)
+{
+	ActiveTexture   texture(0, input);
+	DrawFrameBuffer drawfb(output);
+	Draw(blendFunc);
 }
 
 CUBE_STACK(ActiveShader);

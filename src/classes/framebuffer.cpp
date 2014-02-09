@@ -60,7 +60,7 @@ unsigned int FrameBuffer::GetRelevantAttachments(GLenum* buffer) const
 	return numAttachments;
 }
 
-void FrameBuffer::Attach(Attachment& attachment, const GLenum type, const Texture& texture)
+void FrameBuffer::Attach(Attachment& attachment, const GLenum type, Texture& texture)
 {
 	assert(!attachment);
 
@@ -76,11 +76,19 @@ void FrameBuffer::Attach(Attachment& attachment, const GLenum type, const Render
 	assert(!attachment);
 
 	const Dim size = GetEffectiveSize(rb.Size);
+	const unsigned int samples = GetEffectiveSamples(rb.Samples);
 
 	gltry(glGenRenderbuffers(1, &attachment.buffer));
 	gltry(glBindRenderbuffer(GL_RENDERBUFFER, attachment.buffer));
-	gltry(glRenderbufferStorageMultisample(GL_RENDERBUFFER,
-		GetEffectiveSamples(rb.Samples), rb.Format, size.GetWidth(), size.GetHeight()));
+
+	if(samples <= 1) {
+		gltry(glRenderbufferStorage(GL_RENDERBUFFER,
+			rb.Format, size.GetWidth(), size.GetHeight()));
+	}
+	else {
+		gltry(glRenderbufferStorageMultisample(GL_RENDERBUFFER,
+			samples, rb.Format, size.GetWidth(), size.GetHeight()));
+	}
 	gltry(glBindRenderbuffer(GL_RENDERBUFFER, 0));
 
 	gltry(glBindFramebuffer(GL_FRAMEBUFFER, fb));
@@ -126,7 +134,7 @@ void FrameBuffer::Validate() const
 	}
 }
 
-void FrameBuffer::AttachColor(const unsigned int index, const Texture& texture)
+void FrameBuffer::AttachColor(const unsigned int index, Texture& texture)
 {
 	assert(index < CUBE_MAX_ATTACHMENTS);
 	Attach(targets.color[index], GL_COLOR_ATTACHMENT0+index, texture);
@@ -144,7 +152,7 @@ void FrameBuffer::DetachColor(const unsigned int index)
 	Detach(targets.color[index], GL_COLOR_ATTACHMENT0+index);
 }
 
-void FrameBuffer::AttachDepth(const Texture& texture)
+void FrameBuffer::AttachDepth(Texture& texture)
 {
 	Attach(targets.depth, GL_DEPTH_ATTACHMENT, texture);
 }
@@ -206,11 +214,16 @@ DrawFrameBuffer::DrawFrameBuffer(FrameBuffer& fb) : ActiveObject(fb)
 
 	gltry(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fb.fb));
 	gltry(glDrawBuffers(numAttachments, attachments));
+	gltry(glViewport(0, 0, fb.defaultSize.GetWidth(), fb.defaultSize.GetHeight()));
 }
 
 DrawFrameBuffer::~DrawFrameBuffer()
 {
+	int dispWidth, dispHeight;
+	Core::System::Instance()->GetDisplaySize(dispWidth, dispHeight);
+
 	gltry(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0));
+	gltry(glViewport(0, 0, dispWidth, dispHeight));
 	CUBE_POP;
 }
 
