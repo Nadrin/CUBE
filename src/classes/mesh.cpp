@@ -49,7 +49,7 @@ SubMesh::~SubMesh()
 	if(vbo[TexCoords0]) gltry(glDeleteBuffers(1, &vbo[TexCoords0]));
 }
 
-GLuint SubMesh::CreateVertexBuffer(int index, int components, const aiVector3D* data) const
+GLuint SubMesh::CreateVertexBuffer(int index, int components, const aiVector3D* data)
 {
 	assert(components <= 3);
 	const GLsizei elementSize = components * sizeof(GLfloat);
@@ -71,22 +71,28 @@ GLuint SubMesh::CreateVertexBuffer(int index, int components, const aiVector3D* 
 }
 
 template<typename T>
-void SubMesh::GenerateIndices(const aiFace* data) const
+void SubMesh::GenerateIndices(const aiFace* data)
 {
 	gltry(glBufferData(GL_ELEMENT_ARRAY_BUFFER, 3 * numFaces * sizeof(T), nullptr, GL_STATIC_DRAW));
 
+	unsigned int numValidFaces = 0;
 	T* buffer = (T*)gltry(glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_WRITE_ONLY));
 	for(unsigned int i=0; i<numFaces; i++) {
-		assert(data[i].mNumIndices == 3);
+		if(data[i].mNumIndices != 3) {
+			CUBE_LOG("SubMesh: Warning: Non-triangular face #%02d (%d vertices)\n", i+1, data[i].mNumIndices);
+			continue;
+		}
 
 		*buffer++ = (T)data[i].mIndices[0];
 		*buffer++ = (T)data[i].mIndices[1];
 		*buffer++ = (T)data[i].mIndices[2];
+		numValidFaces++;
 	}
 	gltry(glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER));
+	numFaces = numValidFaces;
 }
 
-GLuint SubMesh::CreateIndexBuffer(const aiFace* data) const
+GLuint SubMesh::CreateIndexBuffer(const aiFace* data)
 {
 	GLuint ibo;
 	gltry(glGenBuffers(1, &ibo));

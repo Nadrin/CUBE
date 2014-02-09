@@ -39,11 +39,11 @@ protected:
 	SubMesh(const aiMesh* mesh);
 	virtual ~SubMesh();
 
-	GLuint CreateVertexBuffer(int index, int components, const aiVector3D* data) const;
-	GLuint CreateIndexBuffer(const aiFace* data) const;
+	GLuint CreateVertexBuffer(int index, int components, const aiVector3D* data);
+	GLuint CreateIndexBuffer(const aiFace* data);
 private:
 	template<typename T>
-	void GenerateIndices(const aiFace* data) const;
+	void GenerateIndices(const aiFace* data);
 public:
 	unsigned int GetVertexCount() const { return numVertices; }
 	unsigned int GetFaceCount() const   { return numFaces;    }
