@@ -161,6 +161,9 @@
     <ClInclude Include="..\..\src\classes\framebuffer.h">
       <Filter>Header Files\classes</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\utils\property.h">
+      <Filter>Header Files\utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\root\shaders\simple_fs.glsl">

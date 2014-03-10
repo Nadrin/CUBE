@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <utils/property.h>
+
 namespace CUBE {
 
 class Shader;
@@ -12,7 +14,7 @@ protected:
 	mutable mat4 transformMatrix;
 	mutable bool isDirty;
 
-	const Actor* parent;
+	const Actor* _parent;
 	bool isAlwaysDirty;
 public:
 	struct {
@@ -28,11 +30,30 @@ public:
 	virtual void Draw();
 	virtual void Draw(Shader& shader) {}
 
+	const vec3& GetPosition() const { return t.position; }
+	const quat& GetRotation() const { return t.rotation; }
+	const vec3& GetScale() const    { return t.scale;    }
+
+	void SetPosition(const vec3& p)
+	{
+		t.position = p;
+		isDirty    = true;
+	}
+	void SetRotation(const quat& r)
+	{
+		t.rotation = r;
+		isDirty    = true;
+	}
+	void SetScale(const vec3& s)
+	{
+		t.scale = s;
+		isDirty = true;
+	}
+
 	void MarkDirty()
 	{ 
 		isDirty = true;
 	}
-
 	void MarkAlawysDirty(bool dirtyFlag)
 	{
 		if(dirtyFlag)
@@ -42,28 +63,26 @@ public:
 			isDirty       = true;
 		}
 	}
-
 	bool IsDirty() const
 	{
 		return isAlwaysDirty || isDirty;
 	}
 
-	Actor& operator<<(const Actor& other)
+	const Actor& GetParent() const
 	{
-		parent  = &other;
+		return *_parent;
+	}
+	void SetParent(const Actor& other)
+	{
+		_parent = &other;
 		isDirty = true;
-		return *this;
 	}
-	const Actor& operator>>(Actor& other) const
-	{
-		other.parent  = this;
-		other.isDirty = true;
-		return *this;
-	}
-public: // attributes
-	vec3& position() { MarkDirty(); return t.position; }
-	vec3& scale()    { MarkDirty(); return t.scale;    }
-	quat& rotation() { MarkDirty(); return t.rotation; }
+
+public: // properties
+	Property<Actor, vec3, &Actor::GetPosition, &Actor::SetPosition> position;
+	Property<Actor, quat, &Actor::GetRotation, &Actor::SetRotation> rotation;
+	Property<Actor, vec3, &Actor::GetScale, &Actor::SetScale>       scale;
+	Property<Actor, Actor, &Actor::GetParent, &Actor::SetParent>    parent;
 
 	const mat4& transform() const;
 };

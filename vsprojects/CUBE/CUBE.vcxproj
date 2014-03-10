@@ -147,6 +147,7 @@
     <ClInclude Include="..\..\src\utils\lock.h" />
     <ClInclude Include="..\..\src\utils\notify.h" />
     <ClInclude Include="..\..\src\utils\parameter.h" />
+    <ClInclude Include="..\..\src\utils\property.h" />
     <ClInclude Include="..\..\src\utils\stack.h" />
   </ItemGroup>
   <ItemGroup>
