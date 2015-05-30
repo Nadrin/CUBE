@@ -19,6 +19,7 @@ public:
 	};
 protected:
 	Dim    size;
+	GLenum iformat;
 	GLenum format;
 	GLenum type;
 	int    samples;
@@ -26,9 +27,13 @@ protected:
 	GLuint id;
 protected:
 	void InitResource(const int components, const ILubyte* pixels);
+	bool DetectFormat();
+
 public:
-	Texture(const Dim& dim, const GLenum format, const GLenum type);
-	Texture(const Dim& dim, const int samples, const GLenum format, const GLenum type);
+	Texture(const Dim& dim, const GLenum autoformat);
+	Texture(const Dim& dim, const int samples, const GLenum autoformat);
+	Texture(const Dim& dim, const GLenum iformat, const GLenum format, const GLenum type);
+	Texture(const Dim& dim, const int samples, const GLenum iformat, const GLenum format, const GLenum type);
 	Texture(const std::string& path, const GLenum overrideType=GL_NONE);
 	virtual ~Texture();
 
@@ -62,6 +67,17 @@ public:
 	{
 		return *samplerObject;
 	}
+};
+
+class ActiveImageBinding : public ActiveObject<const Texture>
+{
+private:
+	GLuint unit;
+
+public:
+	ActiveImageBinding(const GLuint u, const Texture& t,
+		const GLenum access=GL_READ_ONLY, const GLenum format=GL_RGBA32F);
+	~ActiveImageBinding();
 };
 
 } // CUBE

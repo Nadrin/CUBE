@@ -16,14 +16,14 @@ std::string ImageShader::VertexShaderName("image");
 
 Shader::Shader()
 	: notifyHandler(this), nullUniform(this),
-	  vs(0), fs(0), gs(0)
+	  vs(0), fs(0), gs(0), cs(0)
 {
 	program = gltry(glCreateProgram());
 }
 
 Shader::Shader(const std::string& path) 
 	: name(path), path(Prefix+path), notifyHandler(this), nullUniform(this),
-	  vs(0), fs(0), gs(0)
+	  vs(0), fs(0), gs(0), cs(0)
 {
 	program = gltry(glCreateProgram());
 
@@ -43,20 +43,6 @@ Shader::~Shader()
 	DeleteProgram();
 }
 
-ImageShader::ImageShader(const std::string& path) : Shader()
-{
-	this->name = path;
-	this->path = Prefix+path;
-
-	vs = CompileShader(GL_VERTEX_SHADER);
-	fs = CompileShader(GL_FRAGMENT_SHADER);
-
-	if(vs) gltry(glAttachShader(program, vs));
-	if(fs) gltry(glAttachShader(program, fs));
-
-	LinkProgram();
-}
-
 std::string Shader::GetShaderFilename(GLenum type) const
 {
 	switch(type) {
@@ -66,19 +52,6 @@ std::string Shader::GetShaderFilename(GLenum type) const
 		return path+"_fs.glsl";
 	case GL_GEOMETRY_SHADER:
 		return path+"_gs.glsl";
-	default:
-		assert(0);
-	}
-	return std::string();
-}
-
-std::string ImageShader::GetShaderFilename(GLenum type) const
-{
-	switch(type) {
-	case GL_VERTEX_SHADER:
-		return Prefix+VertexShaderName+"_vs.glsl";
-	case GL_FRAGMENT_SHADER:
-		return path+"_fs.glsl";
 	default:
 		assert(0);
 	}
@@ -221,6 +194,7 @@ void Shader::DeleteProgram()
 	if(vs) DeleteShader(GL_VERTEX_SHADER, vs);
 	if(fs) DeleteShader(GL_FRAGMENT_SHADER, fs);
 	if(gs) DeleteShader(GL_GEOMETRY_SHADER, gs);
+	if(cs) DeleteShader(GL_COMPUTE_SHADER, cs);
 
 	gltry(glDeleteProgram(program));
 	program=0;
@@ -244,6 +218,10 @@ void Shader::NotifyHandler::operator()(const std::string& filename)
 	else if(Suffix(filename, "_gs.glsl")) {
 		if(shader->gs)
 			shader->ReloadShader(GL_GEOMETRY_SHADER, shader->gs);
+	}
+	else if(Suffix(filename, "_cs.glsl")) {
+		if(shader->cs)
+			shader->ReloadShader(GL_COMPUTE_SHADER, shader->cs);
 	}
 	else {
 		CUBE_LOG("Warning: Received shader reload event for unknown filename: %s\n", filename.c_str());
@@ -377,6 +355,39 @@ Shader* Shader::Current()
 	return nullptr;
 }
 
+ImageShader::ImageShader(const std::string& path) : Shader()
+{
+	this->name = path;
+	this->path = Prefix+path;
+
+	vs = CompileShader(GL_VERTEX_SHADER);
+	fs = CompileShader(GL_FRAGMENT_SHADER);
+
+	if(vs) gltry(glAttachShader(program, vs));
+	if(fs) gltry(glAttachShader(program, fs));
+
+	LinkProgram();
+}
+
+ImageShader::~ImageShader()
+{
+	if(vs) DeleteShader(GL_VERTEX_SHADER, vs);
+	if(fs) DeleteShader(GL_FRAGMENT_SHADER, fs);
+}
+
+std::string ImageShader::GetShaderFilename(GLenum type) const
+{
+	switch(type) {
+	case GL_VERTEX_SHADER:
+		return Prefix+VertexShaderName+"_vs.glsl";
+	case GL_FRAGMENT_SHADER:
+		return path+"_fs.glsl";
+	default:
+		assert(0);
+	}
+	return std::string();
+}
+
 void ImageShader::Draw(const BlendFunc& blendFunc)
 {
 	const GLboolean blendingEnabled = glIsEnabled(GL_BLEND);
@@ -408,6 +419,44 @@ void ImageShader::Draw(Texture& input, FrameBuffer& output, const BlendFunc& ble
 	ActiveTexture   texture(0, input);
 	DrawFrameBuffer drawfb(output);
 	Draw(blendFunc);
+}
+
+ComputeShader::ComputeShader(const std::string& path) : Shader()
+{
+	this->name = path;
+	this->path = Prefix+path;
+
+	cs = CompileShader(GL_COMPUTE_SHADER);
+	if(cs) gltry(glAttachShader(program, cs));
+
+	LinkProgram();
+}
+
+ComputeShader::~ComputeShader()
+{
+	if(cs) DeleteShader(GL_COMPUTE_SHADER, cs);
+}
+
+std::string ComputeShader::GetShaderFilename(GLenum type) const
+{
+	switch(type) {
+	case GL_COMPUTE_SHADER:
+		return path+"_cs.glsl";
+	default:
+		assert(0);
+	}
+	return std::string();
+}
+
+void ComputeShader::Dispatch(const Dim& groups) const
+{
+	gltry(glDispatchCompute(groups.GetWidth(), groups.GetHeight(), groups.GetDepth()));
+}
+
+void ComputeShader::DispatchSync(const Dim& groups, const GLenum barrier) const
+{
+	gltry(glDispatchCompute(groups.GetWidth(), groups.GetHeight(), groups.GetDepth()));
+	gltry(glMemoryBarrier(barrier));
 }
 
 CUBE_STACK(ActiveShader);

@@ -8,14 +8,31 @@ using namespace CUBE;
 
 std::string Texture::Prefix("textures\\");
 
-Texture::Texture(const Dim& dim, const GLenum format, const GLenum type)
-	: size(dim), samples(1), format(format), type(type)
+Texture::Texture(const Dim& dim, const GLenum autoformat)
+	: size(dim), samples(1), iformat(autoformat)
+{
+	assert(DetectFormat());
+	InitResource(0, nullptr);
+}
+
+Texture::Texture(const Dim& dim, const int samples, const GLenum autoformat)
+	: size(dim), samples(samples), iformat(autoformat)
+{
+	assert(samples > 0);
+	assert(samples == 1 || (dim.GetHeight() >= 1 && dim.GetDepth() == 1));
+
+	assert(DetectFormat());
+	InitResource(0, nullptr);
+}
+
+Texture::Texture(const Dim& dim, const GLenum iformat, const GLenum format, const GLenum type)
+	: size(dim), samples(1), iformat(iformat), format(format), type(type)
 {
 	InitResource(0, nullptr);
 }
 
-Texture::Texture(const Dim& dim, const int samples, const GLenum format, const GLenum type)
-	: size(dim), samples(samples), format(format), type(type)
+Texture::Texture(const Dim& dim, const int samples, const GLenum iformat, const GLenum format, const GLenum type)
+	: size(dim), samples(samples), iformat(iformat), format(format), type(type)
 {
 	assert(samples > 0);
 	assert(samples == 1 || (dim.GetHeight() >= 1 && dim.GetDepth() == 1));
@@ -104,12 +121,20 @@ GLenum Texture::GetTarget() const
 void Texture::InitResource(const int components, const ILubyte* pixels)
 {
 	assert(components >= 0 && components <= 4);
-	static const GLenum formatLUT[] = { GL_INVALID_ENUM, GL_RED, GL_RG, GL_RGB, GL_RGBA };
+
+	static const GLenum formatLUT[]   = { GL_INVALID_ENUM, GL_RED, GL_RG, GL_RGB, GL_RGBA };
+	static const GLenum iformatLUTi[] = { GL_INVALID_ENUM, GL_R8, GL_RG8, GL_RGB8, GL_RGBA8 };
+	static const GLenum iformatLUTf[] = { GL_INVALID_ENUM, GL_R16F, GL_RG16F, GL_RGB16F, GL_RGBA16F };
 
 	GLenum target = GetTarget();
 
-	if(components > 0)
+	if(components > 0) {
 		format = formatLUT[components];
+		if(type == GL_FLOAT)
+			iformat = iformatLUTf[components];
+		else
+			iformat = iformatLUTi[components];
+	}
 	
 	gltry(glGenTextures(1, &id));
 	gltry(glActiveTexture(GL_TEXTURE0));
@@ -117,22 +142,76 @@ void Texture::InitResource(const int components, const ILubyte* pixels)
 
 	switch(target) {
 	case GL_TEXTURE_1D:
-		gltry(glTexImage1D(target, 0, format, size.Width, 0, format, GetType(), pixels));
+		gltry(glTexImage1D(target, 0, iformat, size.Width, 0, format, GetType(), pixels));
 		break;
 	case GL_TEXTURE_2D:
-		gltry(glTexImage2D(target, 0, format, size.Width, size.Height, 0, format, GetType(), pixels));
+		gltry(glTexImage2D(target, 0, iformat, size.Width, size.Height, 0, format, GetType(), pixels));
 		break;
 	case GL_TEXTURE_2D_MULTISAMPLE:
-		gltry(glTexImage2DMultisample(target, samples, format, size.Width, size.Height, GL_FALSE));
+		gltry(glTexImage2DMultisample(target, samples, iformat, size.Width, size.Height, GL_FALSE));
 		break;
 	case GL_TEXTURE_3D:
-		gltry(glTexImage3D(target, 0, format, size.Width, size.Height, size.Depth, 0, format, GetType(), pixels));
+		gltry(glTexImage3D(target, 0, iformat, size.Width, size.Height, size.Depth, 0, format, GetType(), pixels));
 		break;
 	default:
 		assert(0);
 	}
 
 	gltry(glBindTexture(target, 0));
+}
+
+bool Texture::DetectFormat()
+{
+	switch(iformat)
+	{
+	case GL_R8:
+	case GL_R16:
+	case GL_R32UI:
+		type   = GL_UNSIGNED_BYTE;
+		format = GL_RED;
+		break;
+	case GL_RG8:
+	case GL_RG16:
+	case GL_RG32UI:
+		type   = GL_UNSIGNED_BYTE;
+		format = GL_RG;
+		break;
+	case GL_RGB8:
+	case GL_RGB16:
+	case GL_RGB32UI:
+		type   = GL_UNSIGNED_BYTE;
+		format = GL_RGB;
+		break;
+	case GL_RGBA8:
+	case GL_RGBA16:
+	case GL_RGBA32UI:
+		type   = GL_UNSIGNED_BYTE;
+		format = GL_RGBA;
+		break;
+	case GL_R16F:
+	case GL_R32F:
+		type   = GL_FLOAT;
+		format = GL_RED;
+		break;
+	case GL_RG16F:
+	case GL_RG32F:
+		type   = GL_FLOAT;
+		format = GL_RG;
+		break;
+	case GL_RGB16F:
+	case GL_RGB32F:
+		type   = GL_FLOAT;
+		format = GL_RGB;
+		break;
+	case GL_RGBA16F:
+	case GL_RGBA32F:
+		type   = GL_FLOAT;
+		format = GL_RGBA;
+		break;
+	default:
+		return false;
+	}
+	return true;
 }
 
 ActiveTexture::ActiveTexture(const GLuint u, Texture& t, const GLenum minFilter, const GLenum magFilter) 
@@ -153,4 +232,15 @@ ActiveTexture::~ActiveTexture()
 	samplerObject->Unbind(unit);
 	if(ownsSampler)
 		delete samplerObject;
+}
+
+ActiveImageBinding::ActiveImageBinding(const GLuint u, const Texture& t, const GLenum access, const GLenum format)
+	: ActiveObject(t), unit(u)
+{
+	gltry(glBindImageTexture(unit, object().GetID(), 0, GL_FALSE, 0, access, format));
+}
+
+ActiveImageBinding::~ActiveImageBinding()
+{
+	gltry(glBindImageTexture(unit, 0, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA32F));
 }

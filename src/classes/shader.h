@@ -5,6 +5,7 @@
 #include <utils/stack.h>
 #include <utils/notify.h>
 #include <utils/parameter.h>
+#include <utils/dim.h>
 
 namespace CUBE {
 
@@ -16,7 +17,7 @@ class Shader
 public:
 	#include "uniform.inl"
 protected:
-	GLuint vs, fs, gs;
+	GLuint vs, fs, gs, cs;
 	GLuint program;
 
 	GLuint cameraMatrix;
@@ -80,12 +81,26 @@ protected:
 public:
 	ImageShader(const std::string& path);
 	ImageShader(const ImageShader& other) = delete;
+	virtual ~ImageShader();
 
 	void Draw(const BlendFunc& blendFunc=BlendFunc());
 	void Draw(Texture& input, const BlendFunc& blendFunc=BlendFunc());
 	void Draw(Texture& input, FrameBuffer& output, const BlendFunc& blendFunc=BlendFunc());
 
 	static std::string VertexShaderName;
+};
+
+class ComputeShader : public Shader
+{
+protected:
+	virtual std::string GetShaderFilename(GLenum type) const override;
+public:
+	ComputeShader(const std::string& path);
+	ComputeShader(const ComputeShader& other) = delete;
+	virtual ~ComputeShader();
+
+	void Dispatch(const Dim& groups) const;
+	void DispatchSync(const Dim& groups, const GLenum barrier) const;
 };
 
 class ActiveShader : public ActiveObject<Shader>

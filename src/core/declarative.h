@@ -30,7 +30,8 @@
 #define UseCamera(cameraActor)                ActiveCamera camera(cameraActor)
 #define UseMaterial(materialObject)           ActiveMaterial material(materialObject)
 #define UseTexture(unit, textureObject, ...)  ActiveTexture texture##unit(unit, textureObject, ##__VA_ARGS__)
-#define UseDrawBuffer(fbObject)				  DrawFrameBuffer drawfb(fbObject)
+#define BindImage(unit, textureObject, ...)   ActiveImageBinding image##unit(unit, textureObject, ##__VA_ARGS__)
+#define UseDrawBuffer(fbObject)               DrawFrameBuffer drawfb(fbObject)
 #define UseReadBuffer(fbObject)               ReadFrameBuffer readfb(fbObject)
 #define DrawActor(actor)                      actor.Draw()
 
