@@ -2,16 +2,10 @@
 
 #pragma once
 
-#include <assimp/types.h>
-
+#include <classes/assets.h>
 #include <classes/actor.h>
 #include <classes/texture.h>
 #include <utils/cache.h>
-
-struct aiMesh;
-struct aiScene;
-struct aiMaterial;
-struct aiFace;
 
 namespace CUBE {
 
@@ -56,7 +50,6 @@ public:
 class Mesh
 {
 protected:
-	const std::string path;
 	const Flags hints;
 
 	std::vector<SubMesh*>     subMeshes;
@@ -67,12 +60,12 @@ protected:
 protected:
 	Mesh(const Flags hints=Hint::Defaults);
 
-	void InitResource(const aiScene* scene);
+	void InitResource(const Assets::Mesh& asset);
 	void InitTexture(StdMaterial* material, const aiMaterial* source, Texture::Channel channel);
 
-	virtual Flags GetImportFlags() const;
 public:
 	Mesh(const std::string& fp, const Flags hints=Hint::Defaults);
+	Mesh(const Assets::Mesh& data, const Flags hints=Hint::Defaults);
 	Mesh(const Mesh& other) = delete;
 	virtual ~Mesh();
 
@@ -80,9 +73,6 @@ public:
 	unsigned int GetFaceCount() const;
 
 	unsigned int GetSubMeshCount() const { return subMeshes.size(); }
-	const std::string& GetPath() const   { return path; }
-
-	static std::string Prefix;
 
 	friend class MeshActor;
 };

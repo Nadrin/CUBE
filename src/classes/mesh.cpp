@@ -7,13 +7,9 @@
 #include <classes/material.h>
 #include <classes/texture.h>
 
-#include <assimp/Importer.hpp>
 #include <assimp/scene.h>
-#include <assimp/postprocess.h>
 
 using namespace CUBE;
-
-std::string Mesh::Prefix("meshes\\");
 
 SubMesh::SubMesh(const aiMesh* mesh)
 {
@@ -114,17 +110,15 @@ Mesh::Mesh(const Flags hints) : hints(hints)
 {}
 
 Mesh::Mesh(const std::string& fp, const Flags hints)
-	: path(Prefix+fp), hints(hints)
+	: hints(hints)
 {
-	CUBE_LOG("Loading mesh file: %s\n", path.c_str());
+	InitResource(Assets::Mesh(FromFile, fp, hints));
+}
 
-	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(path.c_str(), GetImportFlags());
-	if(!scene) {
-		throw std::runtime_error(importer.GetErrorString());
-	}
-
-	InitResource(scene);
+Mesh::Mesh(const Assets::Mesh& data, const Flags hints)
+	: hints(hints)
+{
+	InitResource(data);
 }
 
 Mesh::~Mesh()
@@ -140,17 +134,15 @@ Mesh::~Mesh()
 	textureCache.Flush();
 }
 
-void Mesh::InitResource(const aiScene* scene)
+void Mesh::InitResource(const Assets::Mesh& asset)
 {
+	const aiScene* scene = asset.GetScene();
+
 	for(unsigned int i=0; i<scene->mNumMeshes; i++) {
 		const aiMesh* mesh = scene->mMeshes[i];
-		if(mesh->HasPositions() && mesh->HasFaces() && mesh->HasNormals()) {
+		if(asset.IsMeshValid(mesh))
 			subMeshes.push_back(new SubMesh(mesh));
-		}
 	}
-
-	if(subMeshes.size() == 0)
-		throw std::runtime_error("No suitable mesh data found in: " + path);
 
 	if(!(hints & Hint::WithMaterials))
 		return;
@@ -189,33 +181,6 @@ void Mesh::InitTexture(StdMaterial* material, const aiMaterial* source, Texture:
 	textureRef.push_back(texture);
 }
 
-
-Flags Mesh::GetImportFlags() const
-{
-	Flags flags = 
-		aiProcess_CalcTangentSpace |
-		aiProcess_Triangulate |
-		aiProcess_PreTransformVertices |
-		aiProcess_RemoveRedundantMaterials |
-		aiProcess_FixInfacingNormals |
-		aiProcess_SortByPType |
-		aiProcess_GenUVCoords |
-		aiProcess_TransformUVCoords;
-
-	if(hints & Hint::FlatNormals)
-		flags |= aiProcess_GenNormals;
-	else
-		flags |= aiProcess_GenSmoothNormals;
-
-#ifdef _DEBUG
-	flags |=
-		aiProcess_ValidateDataStructure |
-		aiProcess_FindDegenerates |
-		aiProcess_FindInvalidData;
-#endif
-	return flags;
-}
-
 unsigned int Mesh::GetVertexCount() const
 {
 	unsigned int ret=0;
@@ -236,13 +201,7 @@ unsigned int Mesh::GetFaceCount() const
 
 Shape::Shape(const std::string& desc, const Flags hints) : Mesh(hints)
 {
-	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFileFromMemory(desc.c_str(), desc.length(), GetImportFlags(), "nff");
-	if(!scene) {
-		throw std::runtime_error(importer.GetErrorString());
-	}
-
-	InitResource(scene);
+	InitResource(Assets::Mesh(FromString, desc, hints));
 }
 
 void MeshActor::DrawDefault(Shader& shader)

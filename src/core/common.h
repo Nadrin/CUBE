@@ -35,6 +35,10 @@ namespace Hint
 	};
 }
 
+enum LoadFromFile   { FromFile   };
+enum LoadFromString { FromString };
+enum LoadFromMemory { FromMemory };
+
 struct BlendFunc
 {
 	GLenum SourceFactor;

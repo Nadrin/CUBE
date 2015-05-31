@@ -107,8 +107,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\classes\actor.cpp" />
+    <ClCompile Include="..\..\src\classes\assets.cpp" />
     <ClCompile Include="..\..\src\classes\camera.cpp" />
     <ClCompile Include="..\..\src\classes\framebuffer.cpp" />
+    <ClCompile Include="..\..\src\classes\geometrybuffer.cpp" />
     <ClCompile Include="..\..\src\classes\material.cpp" />
     <ClCompile Include="..\..\src\classes\mesh.cpp" />
     <ClCompile Include="..\..\src\classes\shader.cpp" />
@@ -127,8 +129,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\classes\actor.h" />
+    <ClInclude Include="..\..\src\classes\assets.h" />
     <ClInclude Include="..\..\src\classes\camera.h" />
     <ClInclude Include="..\..\src\classes\framebuffer.h" />
+    <ClInclude Include="..\..\src\classes\geometrybuffer.h" />
     <ClInclude Include="..\..\src\classes\material.h" />
     <ClInclude Include="..\..\src\classes\mesh.h" />
     <ClInclude Include="..\..\src\classes\shader.h" />
@@ -151,6 +155,7 @@
     <ClInclude Include="..\..\src\utils\stack.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\root\shaders\compute_cs.glsl" />
     <None Include="..\..\root\shaders\image_vs.glsl" />
     <None Include="..\..\root\shaders\simple_fs.glsl" />
     <None Include="..\..\root\shaders\simple_vs.glsl" />
