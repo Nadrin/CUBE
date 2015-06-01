@@ -17,19 +17,19 @@ mat4& CameraActor::Perspective(const float fov, const float zNear, const float z
 {
 	ViewportDim viewport;
 
-	projectionMatrix = glm::perspective(fov, viewport.AspectRatio(), zNear, zFar);
-	return projectionMatrix;
+	projection = glm::perspective(fov, viewport.AspectRatio(), zNear, zFar);
+	return projection;
 }
 
 mat4& CameraActor::Ortho(const Dim& size, const float zNear, const float zFar)
 {
-	projectionMatrix = glm::ortho(-0.5f*size.Width, 0.5f*size.Width, -0.5f*size.Height, 0.5f*size.Height, zNear, zFar);
-	return projectionMatrix;
+	projection = glm::ortho(-0.5f*size.Width, 0.5f*size.Width, -0.5f*size.Height, 0.5f*size.Height, zNear, zFar);
+	return projection;
 }
 
 mat4 CameraActor::CalcTransform() const
 {
-	return projectionMatrix * glm::inverse(transform());
+	return projection * glm::inverse(transform());
 }
 
 bool CameraActor::IsActive() const

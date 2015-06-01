@@ -10,8 +10,6 @@ namespace CUBE {
 
 class CameraActor : public Actor
 {
-protected:
-	mat4 projectionMatrix;
 public:
 	CameraActor();
 	CameraActor(const vec3& position, const quat& rotation=quat());
@@ -24,10 +22,9 @@ public:
 
 	bool IsActive() const;
 	static CameraActor* Current();
-public: // attributes
-	vec3& scale() = delete;
 
-	mat4& projection() { return projectionMatrix; }
+public: // properties
+	mat4 projection;
 };
 
 class ActiveCamera : public ActiveObject<CameraActor>
