@@ -24,9 +24,11 @@ class GeometryBuffer
 {
 public:
 	GeometryBuffer(unsigned int reserve=0);
+	GeometryBuffer(const std::string& path, Flags hints=Hint::Defaults);
 	GeometryBuffer(const Assets::Mesh& data);
 	~GeometryBuffer();
 
+	void LoadMesh(const Assets::Mesh& data);
 	unsigned int GetFaceCount() const { return numFaces; }
 
 protected:

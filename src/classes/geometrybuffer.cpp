@@ -13,9 +13,22 @@ GeometryBuffer::GeometryBuffer(unsigned int reserve)
 	InitResource(reserve);
 }
 
+GeometryBuffer::GeometryBuffer(const std::string& path, Flags hints)
+{
+	Assets::Mesh data(FromFile, path, hints);
+	InitResource(data.GetFaceCount());
+	LoadMesh(data);
+}
+
 GeometryBuffer::GeometryBuffer(const Assets::Mesh& data)
 {
 	InitResource(data.GetFaceCount());
+	LoadMesh(data);
+}
+
+void GeometryBuffer::LoadMesh(const Assets::Mesh& data)
+{
+	assert(data.GetFaceCount() <= numFaces);
 
 	gltry(glBindBuffer(GL_ARRAY_BUFFER, vbo));
 	Face* buffer = (Face*)gltry(glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY));
