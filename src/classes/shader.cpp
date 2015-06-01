@@ -123,8 +123,6 @@ GLuint Shader::CompileShader(GLenum type)
 
 bool Shader::ReloadShader(GLenum type, GLuint& id)
 {
-	CUBE_LOG("Received shader reload notification.\n");
-	
 	GLuint newId;
 	try {
 		newId = CompileShader(type);

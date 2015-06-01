@@ -34,9 +34,6 @@
     <Filter Include="Header Files\demos">
       <UniqueIdentifier>{4e031c94-b622-4d9a-83fc-f3f45228bf91}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\demos">
-      <UniqueIdentifier>{f8df99dd-5141-4001-8224-e36cd10a6118}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\shaders">
       <UniqueIdentifier>{61f92d6c-c4db-4f07-847b-c0ac7c8ea385}</UniqueIdentifier>
     </Filter>
@@ -49,6 +46,9 @@
     <Filter Include="Source Files\shaders\compute">
       <UniqueIdentifier>{a17ec4f5-672c-4e0b-b4f2-a480e5747820}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\demo">
+      <UniqueIdentifier>{f8df99dd-5141-4001-8224-e36cd10a6118}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\main.cpp">
@@ -59,9 +59,6 @@
     </ClCompile>
     <ClCompile Include="..\..\src\utils\notify.cpp">
       <Filter>Source Files\utils</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\demos\test.cpp">
-      <Filter>Source Files\demos</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\core\ui.cpp">
       <Filter>Source Files\core</Filter>
@@ -101,6 +98,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\classes\assets.cpp">
       <Filter>Source Files\classes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\demo\demo.cpp">
+      <Filter>Source Files\demo</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -178,6 +178,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\classes\assets.h">
       <Filter>Header Files\classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\demo\demo.h">
+      <Filter>Source Files\demo</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

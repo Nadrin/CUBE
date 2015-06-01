@@ -118,7 +118,7 @@
     <ClCompile Include="..\..\src\core\config.cpp" />
     <ClCompile Include="..\..\src\core\system.cpp" />
     <ClCompile Include="..\..\src\core\ui.cpp" />
-    <ClCompile Include="..\..\src\demos\test.cpp" />
+    <ClCompile Include="..\..\src\demo\demo.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />
     <ClCompile Include="..\..\src\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -145,6 +145,7 @@
     <ClInclude Include="..\..\src\core\system.h" />
     <ClInclude Include="..\..\src\core\ui.h" />
     <ClInclude Include="..\..\src\demos\test.h" />
+    <ClInclude Include="..\..\src\demo\demo.h" />
     <ClInclude Include="..\..\src\stdafx.h" />
     <ClInclude Include="..\..\src\utils\cache.h" />
     <ClInclude Include="..\..\src\utils\dim.h" />

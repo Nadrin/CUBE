@@ -9,12 +9,11 @@ namespace CUBE {
 
 struct Vertex
 {
-	GLfloat position[3];
-	GLfloat _padding0;
+	GLfloat position[4];
 	GLfloat normal[3];
-	GLfloat _padding1;
+	GLfloat _padding0;
 	GLfloat uv[2];
-	GLfloat _padding2[2];
+	GLfloat _padding1[2];
 };
 struct Face
 {
@@ -37,6 +36,7 @@ protected:
 	unsigned int numFaces;
 
 	friend class GeometryActor;
+	friend class ActiveGeometryBinding;
 };
 
 class GeometryActor : public Actor
@@ -54,6 +54,16 @@ public:
 
 	using Actor::Draw;
 	virtual void Draw(Shader& shader) override;
+};
+
+class ActiveGeometryBinding : public ActiveObject<const GeometryBuffer>
+{
+private:
+	GLuint unit;
+
+public:
+	ActiveGeometryBinding(const GLuint u, const GeometryBuffer& buffer);
+	~ActiveGeometryBinding();
 };
 
 } // CUBE

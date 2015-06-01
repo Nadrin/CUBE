@@ -31,13 +31,14 @@ GeometryBuffer::GeometryBuffer(const Assets::Mesh& data)
 		for(unsigned int j=0; j<mesh->mNumFaces; j++) {
 			const aiFace& face = mesh->mFaces[j];
 			if(face.mNumIndices != 3) {
-				CUBE_LOG("GeometryBuffer: Non-triangular face #%02 (%d vertices)\n", i+1, face.mNumIndices);
+				CUBE_LOG("GeometryBuffer: Non-triangular face #%02d (%d vertices)\n", i+1, face.mNumIndices);
 				continue;
 			}
 
 			for(int k=0; k<3; k++) {
 				std::memcpy(&buffer->v[k].position, &mesh->mVertices[face.mIndices[k]], 3 * sizeof(GLfloat));
 				std::memcpy(&buffer->v[k].normal, &mesh->mNormals[face.mIndices[k]], 3 * sizeof(GLfloat));
+				buffer->v[k].position[3] = 1.0f;
 
 				if(hasUV)
 					std::memcpy(&buffer->v[k].uv, &mesh->mTextureCoords[0][face.mIndices[k]], 2 * sizeof(GLfloat));
@@ -48,7 +49,6 @@ GeometryBuffer::GeometryBuffer(const Assets::Mesh& data)
 		}
 	}
 
-	gltry(glBindBuffer(GL_ARRAY_BUFFER, vbo));
 	gltry(glUnmapBuffer(GL_ARRAY_BUFFER));
 	gltry(glBindBuffer(GL_ARRAY_BUFFER, 0));
 }
@@ -70,7 +70,7 @@ void GeometryBuffer::InitResource(unsigned int numFaces)
 	gltry(glBindBuffer(GL_ARRAY_BUFFER, vbo));
 	gltry(glBufferData(GL_ARRAY_BUFFER, numFaces * sizeof(Face), nullptr, GL_STATIC_DRAW));
 
-	gltry(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0));
+	gltry(glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0));
 	gltry(glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<const GLvoid*>(4*sizeof(GLfloat))));
 	gltry(glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<const GLvoid*>(8*sizeof(GLfloat))));
 
@@ -88,4 +88,15 @@ void GeometryActor::Draw(Shader& shader)
 	gltry(glBindVertexArray(buffer->vao));
 	gltry(glDrawArrays(GL_TRIANGLES, 0, buffer->GetFaceCount()*3));
 	gltry(glBindVertexArray(0));
+}
+
+ActiveGeometryBinding::ActiveGeometryBinding(const GLuint u, const GeometryBuffer& buffer)
+	: ActiveObject(buffer), unit(u)
+{
+	gltry(glBindBufferBase(GL_SHADER_STORAGE_BUFFER, unit, buffer.vbo));
+}
+
+ActiveGeometryBinding::~ActiveGeometryBinding()
+{
+	gltry(glBindBufferBase(GL_SHADER_STORAGE_BUFFER, unit, 0));
 }
