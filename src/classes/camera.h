@@ -16,8 +16,8 @@ public:
 
 	virtual void Draw() override {}
 
-	mat4& Perspective(const float fov, const float zNear=1.0f, const float zFar=1000.0f);
-	mat4& Ortho(const Dim& size, const float zNear=-1.0f, const float zFar=1.0f);
+	mat4& SetPerspective(const float fov, const float zNear=1.0f, const float zFar=1000.0f);
+	mat4& SetOrtho(const Dim& size, const float zNear=-1.0f, const float zFar=1.0f);
 	mat4  CalcTransform() const;
 
 	bool IsActive() const;
