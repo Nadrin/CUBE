@@ -32,6 +32,11 @@ struct Dim
 	{
 		return new Dim(*this);
 	}
+
+	vec3 ToVector() const
+	{
+		return vec3(GetWidth(), GetHeight(), GetDepth());
+	}
 };
 
 struct ViewportDim : public Dim

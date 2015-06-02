@@ -23,6 +23,10 @@ using vec4 = glm::vec4;
 using mat4 = glm::mat4x4;
 using quat = glm::fquat;
 
+static const float Epsilon = 0.00001f;
+static const vec3  UpVector(0.0f, 1.0f, 0.0f);
+static const vec3  ForwardVector(0.0f, 0.0f, 1.0f);
+
 typedef unsigned int Flags;
 
 namespace Hint

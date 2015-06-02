@@ -9,11 +9,15 @@ namespace CUBE {
 
 struct Vertex
 {
-	GLfloat position[4];
-	GLfloat normal[3];
-	GLfloat _padding0;
-	GLfloat uv[2];
-	GLfloat _padding1[2];
+	vec4 p;				// Position
+	vec3 N;				// Normal
+	float _padding0;
+	vec3 T;				// Tangent
+	float _padding1;
+	vec3 S;				// Bitangent
+	float _padding2;
+	vec2 uv;			// UV
+	float _padding3[2];
 };
 struct Face
 {

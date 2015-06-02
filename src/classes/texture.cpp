@@ -4,6 +4,8 @@
 #include <core/system.h>
 #include <classes/texture.h>
 
+#include <glm/gtc/random.hpp>
+
 using namespace CUBE;
 
 std::string Texture::Prefix("textures\\");
@@ -102,6 +104,22 @@ Texture::Texture(const std::string& path, const GLenum overrideType)
 	ilDeleteImages(1, &image);
 }
 
+Texture::Texture(TextureGenColorType, const Dim& dim, const vec4& color, const GLenum type)
+{
+	Generate(dim, [&color](unsigned int, unsigned int) { return color; }, type);
+}
+
+Texture::Texture(TextureGenNoiseType, const Dim& dim, unsigned int seed, const GLenum type)
+{
+	std::srand(seed);
+	Generate(dim, [](unsigned int, unsigned int) { return glm::linearRand(vec4(0.0f), vec4(1.0f)); }, type);
+}
+
+Texture::Texture(TextureGenFunctionType, const Dim& dim, std::function<vec4(unsigned int, unsigned int)> generator, const GLenum type)
+{
+	Generate(dim, generator, type);
+}
+
 Texture::~Texture()
 {
 	if(id != 0)
@@ -142,10 +160,10 @@ void Texture::InitResource(const int components, const ILubyte* pixels)
 
 	switch(target) {
 	case GL_TEXTURE_1D:
-		gltry(glTexImage1D(target, 0, iformat, size.Width, 0, format, GetType(), pixels));
+		gltry(glTexImage1D(target, 0, iformat, size.Width, 0, format, type, pixels));
 		break;
 	case GL_TEXTURE_2D:
-		gltry(glTexImage2D(target, 0, iformat, size.Width, size.Height, 0, format, GetType(), pixels));
+		gltry(glTexImage2D(target, 0, iformat, size.Width, size.Height, 0, format, type, pixels));
 		break;
 	case GL_TEXTURE_2D_MULTISAMPLE:
 		gltry(glTexImage2DMultisample(target, samples, iformat, size.Width, size.Height, GL_FALSE));
@@ -158,6 +176,41 @@ void Texture::InitResource(const int components, const ILubyte* pixels)
 	}
 
 	gltry(glBindTexture(target, 0));
+}
+
+void Texture::Generate(const Dim& dim, std::function<vec4(unsigned int, unsigned int)> generator, const GLenum type)
+{
+	ILuint image;
+	ilGenImages(1, &image);
+	ilBindImage(image);
+
+	const unsigned int numBytes = dim.GetWidth() * dim.GetHeight();
+	vec4* pixels = new vec4[numBytes];
+	for(unsigned int y=0; y<dim.GetHeight(); y++) {
+		for(unsigned int x=0; x<dim.GetWidth(); x++) {
+			pixels[y*dim.GetWidth() + x] = generator(x, y);
+		}
+	}
+	ilTexImage(dim.GetWidth(), dim.GetHeight(), 1, 4, IL_RGBA, IL_FLOAT, reinterpret_cast<void*>(pixels));
+	delete[] pixels;
+
+	if(type == GL_UNSIGNED_BYTE) {
+		this->iformat = GL_RGBA8;
+		this->type    = GL_UNSIGNED_BYTE;
+		ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
+	}
+	else {
+		this->iformat = GL_RGBA32F;
+		this->type    = GL_FLOAT;
+	}
+	this->format = GL_RGBA;
+
+	size.Width  = ilGetInteger(IL_IMAGE_WIDTH);
+	size.Height = ilGetInteger(IL_IMAGE_HEIGHT);
+	size.Depth  = ilGetInteger(IL_IMAGE_DEPTH);
+
+	InitResource(4, ilGetData());
+	ilDeleteImages(1, &image);
 }
 
 bool Texture::DetectFormat()

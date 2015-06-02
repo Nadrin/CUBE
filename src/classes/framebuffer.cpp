@@ -245,12 +245,15 @@ ReadFrameBuffer::~ReadFrameBuffer()
 
 void ReadFrameBuffer::Blit(const GLbitfield mask, const GLenum filter) const
 {
-	const Dim& size    = objectPtr->defaultSize;
-	const GLint rect[] = { 0, 0, size.GetWidth()-1, size.GetHeight()-1 };
+	const Dim& size       = objectPtr->defaultSize;
+	const GLint srcrect[] = { 0, 0, size.GetWidth()-1, size.GetHeight()-1 };
+
+	GLint dstrect[4];
+	gltry(glGetIntegerv(GL_VIEWPORT, dstrect));
 
 	gltry(glBlitFramebuffer(
-		rect[0], rect[1], rect[2], rect[3],
-		rect[0], rect[1], rect[2], rect[3],
+		srcrect[0], srcrect[1], srcrect[2],   srcrect[3],
+		dstrect[0], dstrect[1], dstrect[2]-1, dstrect[3]-1,
 		mask, filter));
 }
 

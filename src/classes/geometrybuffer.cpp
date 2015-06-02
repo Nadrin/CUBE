@@ -49,14 +49,18 @@ void GeometryBuffer::LoadMesh(const Assets::Mesh& data)
 			}
 
 			for(int k=0; k<3; k++) {
-				std::memcpy(&buffer->v[k].position, &mesh->mVertices[face.mIndices[k]], 3 * sizeof(GLfloat));
-				std::memcpy(&buffer->v[k].normal, &mesh->mNormals[face.mIndices[k]], 3 * sizeof(GLfloat));
-				buffer->v[k].position[3] = 1.0f;
+				Vertex& vtx = buffer->v[k];
+				std::memcpy(&vtx.p, &mesh->mVertices[face.mIndices[k]], 3 * sizeof(GLfloat));
+				std::memcpy(&vtx.N, &mesh->mNormals[face.mIndices[k]], 3 * sizeof(GLfloat));
+				vtx.p.w = 1.0f;
 
 				if(hasUV)
-					std::memcpy(&buffer->v[k].uv, &mesh->mTextureCoords[0][face.mIndices[k]], 2 * sizeof(GLfloat));
-				else
-					std::memset(&buffer->v[k].uv, 0, 2 * sizeof(GLfloat));
+					std::memcpy(&vtx.uv, &mesh->mTextureCoords[0][face.mIndices[k]], 2 * sizeof(GLfloat));
+
+				vtx.T = glm::cross(vtx.N, UpVector);
+				if(glm::dot(vtx.T, vtx.T) < Epsilon)
+					vtx.T = glm::cross(vtx.N, ForwardVector);
+				vtx.S = glm::cross(vtx.N, vtx.T);
 			}
 			buffer++;
 		}
