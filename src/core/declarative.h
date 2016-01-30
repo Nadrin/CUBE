@@ -6,7 +6,7 @@
 #define IMPLEMENT_DEMO(DemoClass) void Core::Demo::Implementation() { DemoClass().Main(); }
 
 // Blocks
-#define block          // Syntactic sugar for simple C++ scope block
+#define glstate        // Syntactic sugar for simple C++ scope block for OpenGL state definition
 #define sequence       Declarative::Sequence _Sequence(Time);
 #define scene(name)    static auto _SceneFunction_##name = [&](float SceneTime, float SceneDuration)
 #define render         static auto _RenderFunction = [&](float Time)
