@@ -12,8 +12,6 @@
 [Rr]elease/
 x64/
 build/
-[Bb]in/
-[Oo]bj/
 
 # Enable "build/" folder in the NuGet Packages folder since NuGet packages use it for MSBuild targets
 !packages/*/build/
@@ -155,11 +153,3 @@ $RECYCLE.BIN/
 # =========================
 
 sdk/
-
-root/*.exe
-root/*.dll
-root/*.ini
-root/*.mp3
-
-root/meshes/
-root/textures/
