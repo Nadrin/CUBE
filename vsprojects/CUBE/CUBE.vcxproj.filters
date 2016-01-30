@@ -31,24 +31,6 @@
     <Filter Include="Source Files\classes">
       <UniqueIdentifier>{c752d582-4b29-45b6-b379-91b5e8e4ac94}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\demos">
-      <UniqueIdentifier>{4e031c94-b622-4d9a-83fc-f3f45228bf91}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\shaders">
-      <UniqueIdentifier>{61f92d6c-c4db-4f07-847b-c0ac7c8ea385}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\shaders\simple">
-      <UniqueIdentifier>{fb84af2d-a89b-4ce3-8600-11f242405522}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\shaders\pp">
-      <UniqueIdentifier>{7e967e92-a607-4f43-9b2e-2bd0107c502b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\shaders\compute">
-      <UniqueIdentifier>{a17ec4f5-672c-4e0b-b4f2-a480e5747820}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\demo">
-      <UniqueIdentifier>{f8df99dd-5141-4001-8224-e36cd10a6118}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\main.cpp">
@@ -99,9 +81,6 @@
     <ClCompile Include="..\..\src\classes\assets.cpp">
       <Filter>Source Files\classes</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\demo\demo.cpp">
-      <Filter>Source Files\demo</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\stdafx.h">
@@ -115,9 +94,6 @@
     </ClInclude>
     <ClInclude Include="..\..\src\core\demo.h">
       <Filter>Header Files\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\demos\test.h">
-      <Filter>Header Files\demos</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\core\ui.h">
       <Filter>Header Files\core</Filter>
@@ -179,28 +155,10 @@
     <ClInclude Include="..\..\src\classes\assets.h">
       <Filter>Header Files\classes</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\demo\demo.h">
-      <Filter>Source Files\demo</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\root\shaders\simple_fs.glsl">
-      <Filter>Source Files\shaders\simple</Filter>
-    </None>
-    <None Include="..\..\root\shaders\simple_vs.glsl">
-      <Filter>Source Files\shaders\simple</Filter>
-    </None>
     <None Include="..\..\src\classes\sampler.inl">
       <Filter>Header Files\classes</Filter>
-    </None>
-    <None Include="..\..\root\shaders\image_vs.glsl">
-      <Filter>Source Files\shaders\pp</Filter>
-    </None>
-    <None Include="..\..\root\shaders\testpp_fs.glsl">
-      <Filter>Source Files\shaders\pp</Filter>
-    </None>
-    <None Include="..\..\root\shaders\compute_cs.glsl">
-      <Filter>Source Files\shaders\compute</Filter>
     </None>
   </ItemGroup>
 </Project>
