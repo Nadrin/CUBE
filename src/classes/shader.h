@@ -20,6 +20,7 @@ protected:
 	GLuint vs, fs, gs, cs;
 	GLuint program;
 
+	GLuint globalTime;
 	GLuint cameraMatrix;
 	GLuint modelMatrix;
 	GLuint normalMatrix;
@@ -58,6 +59,7 @@ public:
 	const std::string& GetPath() const { return path; }
 	const std::string& GetName() const { return name; }
 
+	bool SetGlobalTime(float time) const;
 	bool SetCameraMatrix(const mat4& matrix) const;
 	bool SetCameraMatrix(const mat4& projection, const mat4& view) const;
 	bool SetModelMatrix(const mat4& matrix) const;

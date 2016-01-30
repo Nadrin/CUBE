@@ -254,6 +254,7 @@ Shader::Uniform& Shader::operator[](const std::string& name) const
 
 void Shader::ValidateUniforms()
 {
+	globalTime   = glGetUniformLocation(program, "GlobalTime");
 	cameraMatrix = glGetUniformLocation(program, "CameraMatrix");
 	modelMatrix  = glGetUniformLocation(program, "ModelMatrix");
 	normalMatrix = glGetUniformLocation(program, "NormalMatrix");
@@ -309,6 +310,15 @@ void Shader::CreateParameters()
 
 		uniformParameters.push_back(new ShaderParameter(this, namebuf, ptype));
 	}
+}
+
+bool Shader::SetGlobalTime(float time) const
+{
+	if(globalTime != -1) {
+		gltry(glUniform1f(globalTime, time));
+		return true;
+	}
+	return false;
 }
 
 bool Shader::SetCameraMatrix(const mat4& matrix) const
@@ -463,6 +473,7 @@ ActiveShader::ActiveShader(Shader& s) : ActiveObject(s)
 {
 	CUBE_PUSH;
 	gltry(glUseProgram(objectPtr->program));
+	objectPtr->SetGlobalTime(Core::System::Instance()->GetTime());
 }
 
 ActiveShader::~ActiveShader()

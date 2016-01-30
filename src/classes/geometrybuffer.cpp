@@ -89,7 +89,9 @@ void GeometryBuffer::InitResource(unsigned int numFaces)
 
 	gltry(glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0));
 	gltry(glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<const GLvoid*>(4*sizeof(GLfloat))));
-	gltry(glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<const GLvoid*>(8*sizeof(GLfloat))));
+	gltry(glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<const GLvoid*>(8*sizeof(GLfloat))));
+	gltry(glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<const GLvoid*>(12*sizeof(GLfloat))));
+	gltry(glVertexAttribPointer(4, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<const GLvoid*>(16*sizeof(GLfloat))));
 
 	for(int i=0; i<3; i++)
 		gltry(glEnableVertexAttribArray(i));

@@ -50,8 +50,9 @@ public:
 
 	GLenum GetTarget() const;
 
-	GLenum GetType() const    { return type;   }
-	GLenum GetFormat() const  { return format; }
+	GLenum GetType() const     { return type;   }
+	GLenum GetFormat() const   { return format; }
+	const Dim& GetSize() const { return size;   }
 
 	inline GLuint GetID() const { return id; }
 
