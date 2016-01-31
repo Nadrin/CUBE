@@ -41,15 +41,15 @@ struct Dim
 
 struct ViewportDim : public Dim
 {
-	ViewportDim(const unsigned int divw=1, const unsigned int divh=1)
+	ViewportDim(const float wfract=1.0f, const float hfract=1.0f)
 	{
-		assert(divw != 0 && divh != 0);
+		assert(wfract > Epsilon && hfract > Epsilon);
 
 		int dispWidth, dispHeight;
 		Core::System::Instance()->GetDisplaySize(dispWidth, dispHeight);
 
-		Width  = glm::max(dispWidth / divw, unsigned int(1));
-		Height = glm::max(dispHeight / divh, unsigned int(1));
+		Width  = glm::max(unsigned int(dispWidth * wfract), unsigned int(1));
+		Height = glm::max(unsigned int(dispHeight * hfract), unsigned int(1));
 		Depth  = 1;
 	}
 	ViewportDim(const ViewportDim& other) : Dim(other) {}
