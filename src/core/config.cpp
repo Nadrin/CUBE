@@ -55,7 +55,7 @@ bool Config::Read(const std::string& filename)
 	return true;
 }
 
-#ifdef _DEBUG
+#ifdef CUBE_DEBUG
 bool ConfigRW::Write()
 {
 	if(filename.empty())

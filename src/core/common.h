@@ -7,7 +7,7 @@
 #define CUBE_MAX_ATTACHMENTS 16
 #define CUBE_MAX_BINDINGS    32
 
-#ifdef _DEBUG
+#ifdef CUBE_DEBUG_GL
 #define gltry(function_call) \
 	function_call; \
 	CUBE::Core::System::CheckErrorGL(#function_call, __FILE__, __LINE__)

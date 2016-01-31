@@ -60,7 +60,7 @@ Flags Mesh::GetImportFlags(const Flags hints)
 	else
 		flags |= aiProcess_GenSmoothNormals;
 
-#ifdef _DEBUG
+#ifdef CUBE_DEBUG
 	flags |=
 		aiProcess_ValidateDataStructure |
 		aiProcess_FindDegenerates |

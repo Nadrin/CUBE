@@ -8,7 +8,7 @@
 using namespace CUBE;
 using namespace CUBE::Core;
 
-#ifdef _DEBUG
+#ifdef CUBE_GUI
 
 TweakBarUI::TweakBarUI(GLFWwindow* window, const int width, const int height) 
 	: UI(), clientWidth(width), clientHeight(height)

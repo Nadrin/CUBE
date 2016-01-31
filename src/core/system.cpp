@@ -7,7 +7,7 @@
 
 #include <utils/notify.h>
 
-#ifdef _DEBUG
+#ifdef CUBE_DEBUG
 #include <assimp/DefaultLogger.hpp>
 #include <assimp/LogStream.hpp>
 #endif
@@ -20,7 +20,7 @@ class Core::UI*     CUBE::UI     = nullptr;
 
 using namespace CUBE::Core;
 
-#ifdef _DEBUG
+#ifdef CUBE_DEBUG
 struct AssimpLogStream : public Assimp::LogStream
 {
 	void write(const char* message)
@@ -45,14 +45,14 @@ Core::System* System::Instance()
 void System::KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
 	if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-#ifdef _DEBUG
+#ifdef CUBE_DEBUG
 		if(mods & GLFW_MOD_SHIFT)
 #endif
 		glfwSetWindowShouldClose(window, GL_TRUE);
 		return;
 	}
 
-#ifdef _DEBUG
+#ifdef CUBE_GUI
 	switch(key) {
 	case GLFW_KEY_F1:
 		if(action == GLFW_PRESS) System::Instance()->ToggleUI();
@@ -125,7 +125,7 @@ void System::Init()
 	std::setlocale(LC_ALL, "en_US.UTF-8");
 	strcpy_s<100>(System::name, "CUBE");
 
-#ifdef _DEBUG
+#ifdef CUBE_DEBUG
 	AllocConsole();
 	SetConsoleTitleA("Debug Console");
 
@@ -169,8 +169,11 @@ void System::Terminate()
 
 	System::Log("CUBE demo toolkit terminated.\n");
 
-#ifdef _DEBUG
+#ifdef CUBE_GUI
 	glDeleteQueries(1, &DebugInfo.frameTimeQuery);
+#endif
+
+#ifdef CUBE_DEBUG
 	Assimp::DefaultLogger::kill();
 	FreeConsole();
 #endif
@@ -218,9 +221,9 @@ void System::OpenDisplay(const int width, const int height, bool fullscreen)
 	System::Log("Opened display: OpenGL %s (%dx%d)\n", glGetString(GL_VERSION), width, height);
 	System::Log("Renderer: %s %s\n", glGetString(GL_VENDOR), glGetString(GL_RENDERER));
 
-#ifdef _DEBUG
+#ifdef CUBE_GUI
 	System::UI = new Core::TweakBarUI(window, width, height);
-	System::Log("Debug GUI initialized.\n");
+	System::Log("GUI initialized.\n");
 	glGenQueries(1, &DebugInfo.frameTimeQuery);
 #else
 	System::UI = new Core::NullUI();
@@ -254,11 +257,13 @@ void System::Run(RenderFunction renderFunction)
 		UI->Draw();
 		glEndQuery(GL_TIME_ELAPSED);
 
-#ifdef _DEBUG
+#ifdef CUBE_GUI
 		GLuint64 frameTime;
 		glGetQueryObjectui64v(DebugInfo.frameTimeQuery, GL_QUERY_RESULT, &frameTime);
-
 		System::UpdateDebugInfo(frameTime);
+#endif
+
+#ifdef CUBE_DEBUG
 		if(NotifyService)
 			NotifyService->ProcessEvents();
 #endif
@@ -343,7 +348,7 @@ void System::Seek(const float delta)
 
 bool System::SetContentDirectory(const std::string& path)
 {
-#ifdef _DEBUG
+#ifdef CUBE_DEBUG
 	if(NotifyService)
 		return false;
 	NotifyService = new FileNotify(path);
@@ -359,7 +364,7 @@ const std::string& System::GetContentDirectory() const
 
 void System::Debug_SetSceneName(const char* name) const
 {
-#ifdef _DEBUG
+#ifdef CUBE_DEBUG
 	DebugInfo.SceneName = std::string(name);
 #endif
 }
@@ -369,7 +374,7 @@ void System::HandleException(const std::exception& e)
 	std::string message(e.what());
 	try { BASS_Stop(); } catch(const std::exception&) {};
 
-#ifdef _DEBUG
+#ifdef CUBE_DEBUG
 	message.append("\nDo you want to debug?");
 	if(MessageBoxA(NULL, message.c_str(), "CUBE [Exception]", MB_ICONSTOP | MB_YESNO) == IDYES)
 		throw;

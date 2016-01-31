@@ -30,7 +30,7 @@ public:
 	virtual void Unregister(Parameter* param) {}
 };
 
-#ifdef _DEBUG
+#ifdef CUBE_DEBUG
 class ConfigRW : public Config
 {
 protected:

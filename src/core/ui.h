@@ -55,7 +55,7 @@ public:
 	NullUI() : UI() {}
 };
 
-#ifdef _DEBUG
+#ifdef CUBE_GUI
 class TweakBarUI : public UI
 {
 protected:

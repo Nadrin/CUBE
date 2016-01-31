@@ -100,7 +100,7 @@ GLuint Shader::CompileShader(GLenum type)
 
 	CUBE_LOG("Compiling shader: %s\n", filename.c_str());
 	gltry(glCompileShader(shader));
-#ifdef _DEBUG
+#ifdef CUBE_DEBUG
 	{
 		std::string infoLog(GetInfoLog(shader, type));
 		if(infoLog.find_first_not_of(" \t\n\r") != std::string::npos)
@@ -115,7 +115,7 @@ GLuint Shader::CompileShader(GLenum type)
 		throw std::runtime_error("Shader compilation failed.");
 	}
 
-#ifdef _DEBUG
+#ifdef CUBE_DEBUG
 	Core::System::Instance()->NotifyService->RegisterHandler(filename, &notifyHandler);
 #endif
 	return shader;
@@ -145,7 +145,7 @@ bool Shader::ReloadShader(GLenum type, GLuint& id)
 
 void Shader::DeleteShader(GLenum type, GLuint& id)
 {
-#ifdef _DEBUG
+#ifdef CUBE_DEBUG
 	Core::System::Instance()->NotifyService->UnregisterHandler(GetShaderFilename(type));
 #endif
 
@@ -162,7 +162,7 @@ void Shader::LinkProgram()
 	GLint status;
 	gltry(glGetProgramiv(program, GL_LINK_STATUS, &status));
 
-#ifdef _DEBUG
+#ifdef CUBE_DEBUG
 	if(GL_TRUE == status) {
 		gltry(glValidateProgram(program));
 		gltry(glGetProgramiv(program, GL_VALIDATE_STATUS, &status));
