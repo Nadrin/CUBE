@@ -84,6 +84,14 @@ void System::KeyCallback(GLFWwindow* window, int key, int scancode, int action, 
 			return;
 		}
 		break;
+	default:
+		if(action == GLFW_PRESS) {
+			auto handlerIt = System::Instance()->keyHandlers.find(key);
+			if(handlerIt != System::Instance()->keyHandlers.end()) {
+				handlerIt->second();
+			}
+		}
+		break;
 	}
 
 	((TweakBarUI*)System::Instance()->UI)->TranslateKeyEvent(key, action);
@@ -235,7 +243,7 @@ float System::GetTime()
 	return (float)BASS_ChannelBytes2Seconds(stream, BASS_ChannelGetPosition(stream, BASS_POS_BYTE));
 }
 
-void System::Run(RenderBlock renderFunction)
+void System::Run(RenderFunction renderFunction)
 {
 	BASS_ChannelPlay(stream, TRUE);
 
@@ -314,6 +322,16 @@ void System::ArrangeUI(PlacementMode placement)
 		UI->Placement = placement;
 		UI->Arrange();
 	}
+}
+
+void System::RegisterKey(int key, KeyHandler handler)
+{
+	keyHandlers[key] = handler;
+}
+
+void System::UnregisterKey(int key)
+{
+	keyHandlers.erase(key);
 }
 
 void System::Seek(const float delta)

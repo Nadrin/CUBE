@@ -65,11 +65,25 @@ public:
 		});
 		return *this;
 	}
+	Uniform& operator=(const std::vector<float>& value)
+	{
+		UseAndSet([this, &value]() {
+			gltry(glUniform1fv(location, value.size(), &value[0]));
+		});
+		return *this;
+	}
 	Uniform& operator=(const vec2& value)
 	{
 		UseAndSet([this, &value]() { 
 			gltry(glUniform2fv(location, 1, glm::value_ptr(value)));
 			UpdateParameter(value);
+		});
+		return *this;
+	}
+	Uniform& operator=(const std::vector<vec2>& value)
+	{
+		UseAndSet([this, &value]() {
+			gltry(glUniform2fv(location, value.size(), glm::value_ptr(value[0])));
 		});
 		return *this;
 	}
@@ -81,11 +95,25 @@ public:
 		});
 		return *this;
 	}
+	Uniform& operator=(const std::vector<vec3>& value)
+	{
+		UseAndSet([this, &value]() {
+			gltry(glUniform3fv(location, value.size(), glm::value_ptr(value[0])));
+		});
+		return *this;
+	}
 	Uniform& operator=(const vec4& value)
 	{
 		UseAndSet([this, &value]() { 
 			gltry(glUniform4fv(location, 1, glm::value_ptr(value)));
 			UpdateParameter(value);
+		});
+		return *this;
+	}
+	Uniform& operator=(const std::vector<vec4>& value)
+	{
+		UseAndSet([this, &value]() {
+			gltry(glUniform4fv(location, value.size(), glm::value_ptr(value[0])));
 		});
 		return *this;
 	}

@@ -9,7 +9,8 @@ namespace CUBE {
 class FileNotify;
 enum class PlacementMode;
 
-typedef std::function<bool (float)> RenderBlock;
+typedef std::function<bool (float)> RenderFunction;
+typedef std::function<void ()>      KeyHandler;
 
 namespace Core {
 
@@ -24,6 +25,8 @@ private:
 	 GLFWwindow* window;
 	 HSTREAM     stream;
 	 std::string contentDirectory;
+
+	 std::map<int, KeyHandler> keyHandlers;
 
 	 struct {
 		 GLuint vao;
@@ -71,9 +74,12 @@ public:
 	 void  ToggleUI();
 	 void  ArrangeUI(PlacementMode placement);
 
+	 void  RegisterKey(int key, KeyHandler handler);
+	 void  UnregisterKey(int key);
+
 	 void  DrawScreenQuad() const;
 
-	 void  Run(RenderBlock renderFunction);
+	 void  Run(RenderFunction renderFunction);
 
 	 bool SetContentDirectory(const std::string& path);
 	 const std::string& GetContentDirectory() const;
