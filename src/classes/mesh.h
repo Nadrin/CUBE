@@ -17,6 +17,8 @@ protected:
 	enum Binding {
 		Positions = 0,
 		Normals,
+		Tangents,
+		Bitangents,
 		TexCoords0,
 		NumBindings,
 	};

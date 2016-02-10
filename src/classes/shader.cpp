@@ -254,10 +254,11 @@ Shader::Uniform& Shader::operator[](const std::string& name) const
 
 void Shader::ValidateUniforms()
 {
-	globalTime   = glGetUniformLocation(program, "GlobalTime");
-	cameraMatrix = glGetUniformLocation(program, "CameraMatrix");
-	modelMatrix  = glGetUniformLocation(program, "ModelMatrix");
-	normalMatrix = glGetUniformLocation(program, "NormalMatrix");
+	globalTime     = glGetUniformLocation(program, "GlobalTime");
+	cameraMatrix   = glGetUniformLocation(program, "CameraMatrix");
+	cameraPosition = glGetUniformLocation(program, "CameraPosition");
+	modelMatrix    = glGetUniformLocation(program, "ModelMatrix");
+	normalMatrix   = glGetUniformLocation(program, "NormalMatrix");
 
 	for(auto it=uniformCache.begin(); it!=uniformCache.end();) {
 		GLint location = gltry(glGetUniformLocation(program, it->first.c_str()));
@@ -346,6 +347,15 @@ bool Shader::SetModelMatrix(const mat4& matrix) const
 		gltry(glUniformMatrix4fv(modelMatrix, 1, GL_FALSE, glm::value_ptr(matrix)));
 		if(normalMatrix != -1)
 			gltry(glUniformMatrix4fv(normalMatrix, 1, GL_FALSE, glm::value_ptr(glm::inverseTranspose(matrix))));
+		return true;
+	}
+	return false;
+}
+
+bool CUBE::Shader::SetCameraPosition(const vec3& position) const
+{
+	if(cameraPosition != -1) {
+		gltry(glUniform3f(cameraPosition, position.x, position.y, position.z));
 		return true;
 	}
 	return false;

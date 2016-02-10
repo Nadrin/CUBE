@@ -9,8 +9,8 @@ namespace CUBE {
 class FileNotify;
 enum class PlacementMode;
 
-typedef std::function<bool (float)> RenderFunction;
-typedef std::function<void ()>      KeyHandler;
+typedef std::function<bool (float, float)> RenderFunction;
+typedef std::function<void ()> KeyHandler;
 
 namespace Core {
 

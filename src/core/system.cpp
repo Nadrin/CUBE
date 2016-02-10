@@ -250,11 +250,14 @@ void System::Run(RenderFunction renderFunction)
 {
 	BASS_ChannelPlay(stream, TRUE);
 
+	float PreviousTime = GetTime();
 	while(!glfwWindowShouldClose(window)) {
 		glBeginQuery(GL_TIME_ELAPSED, DebugInfo.frameTimeQuery);
-		if(!renderFunction(GetTime()))
+		float CurrentTime = GetTime();
+		if(!renderFunction(CurrentTime, PreviousTime - CurrentTime))
 			glfwSetWindowShouldClose(window, true);
 		UI->Draw();
+		PreviousTime = CurrentTime;
 		glEndQuery(GL_TIME_ELAPSED);
 
 #ifdef CUBE_GUI

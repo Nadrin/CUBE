@@ -53,12 +53,14 @@ ActiveCamera::ActiveCamera(CameraActor& s) : ActiveObject(s)
 
 	Shader& shader = ActiveShader::Stack.Current()->object();
 	shader.SetCameraMatrix(objectPtr->CalcTransform());
+	shader.SetCameraPosition(objectPtr->GetPosition());
 }
 
 ActiveCamera::ActiveCamera(CameraActor& s, Shader& shader) : ActiveObject(s)
 {
 	CUBE_PUSH;
 	shader.SetCameraMatrix(objectPtr->CalcTransform());
+	shader.SetCameraPosition(objectPtr->GetPosition());
 }
 
 ActiveCamera::~ActiveCamera()

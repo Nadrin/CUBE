@@ -17,16 +17,21 @@ SubMesh::SubMesh(const aiMesh* mesh)
 	numFaces    = mesh->mNumFaces;
 	materialID  = mesh->mMaterialIndex;
 
+	std::memset(&vbo, 0, sizeof(vbo));
+
 	gltry(glGenVertexArrays(1, &vao));
 	gltry(glBindVertexArray(vao));
 
-	vbo[Positions] = CreateVertexBuffer(0, 3, mesh->mVertices);
-	vbo[Normals]   = CreateVertexBuffer(1, 3, mesh->mNormals);
-		
-	if(mesh->HasTextureCoords(0))
-		vbo[TexCoords0] = CreateVertexBuffer(2, mesh->mNumUVComponents[0], mesh->mTextureCoords[0]);
-	else 
-		vbo[TexCoords0] = 0;
+	vbo[Positions] = CreateVertexBuffer(Positions, 3, mesh->mVertices);
+	vbo[Normals]   = CreateVertexBuffer(Normals, 3, mesh->mNormals);
+	
+	if(mesh->HasTangentsAndBitangents()) {
+		vbo[Tangents]   = CreateVertexBuffer(Tangents, 3, mesh->mTangents);
+		vbo[Bitangents] = CreateVertexBuffer(Bitangents, 3, mesh->mBitangents);
+	}
+	if(mesh->HasTextureCoords(0)) {
+		vbo[TexCoords0] = CreateVertexBuffer(TexCoords0, mesh->mNumUVComponents[0], mesh->mTextureCoords[0]);
+	}
 
 	ibo = CreateIndexBuffer(mesh->mFaces);
 
@@ -42,6 +47,8 @@ SubMesh::~SubMesh()
 
 	if(vbo[Positions])  gltry(glDeleteBuffers(1, &vbo[Positions]));
 	if(vbo[Normals])    gltry(glDeleteBuffers(1, &vbo[Normals]));
+	if(vbo[Tangents])   gltry(glDeleteBuffers(1, &vbo[Tangents]));
+	if(vbo[Bitangents]) gltry(glDeleteBuffers(1, &vbo[Bitangents]));
 	if(vbo[TexCoords0]) gltry(glDeleteBuffers(1, &vbo[TexCoords0]));
 }
 

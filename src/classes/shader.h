@@ -22,6 +22,7 @@ protected:
 
 	GLuint globalTime;
 	GLuint cameraMatrix;
+	GLuint cameraPosition;
 	GLuint modelMatrix;
 	GLuint normalMatrix;
 
@@ -62,6 +63,7 @@ public:
 	bool SetGlobalTime(float time) const;
 	bool SetCameraMatrix(const mat4& matrix) const;
 	bool SetCameraMatrix(const mat4& projection, const mat4& view) const;
+	bool SetCameraPosition(const vec3& position) const;
 	bool SetModelMatrix(const mat4& matrix) const;
 
 	bool IsActive() const;
