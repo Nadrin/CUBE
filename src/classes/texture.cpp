@@ -14,7 +14,7 @@ Texture::Texture(const Dim& dim, const GLenum autoformat)
 	: size(dim), samples(1), iformat(autoformat)
 {
 	assert(DetectFormat());
-	InitResource(0, nullptr);
+	InitResource(0, false, nullptr);
 }
 
 Texture::Texture(const Dim& dim, const int samples, const GLenum autoformat)
@@ -24,13 +24,13 @@ Texture::Texture(const Dim& dim, const int samples, const GLenum autoformat)
 	assert(samples == 1 || (dim.GetHeight() >= 1 && dim.GetDepth() == 1));
 
 	assert(DetectFormat());
-	InitResource(0, nullptr);
+	InitResource(0, false, nullptr);
 }
 
 Texture::Texture(const Dim& dim, const GLenum iformat, const GLenum format, const GLenum type)
 	: size(dim), samples(1), iformat(iformat), format(format), type(type)
 {
-	InitResource(0, nullptr);
+	InitResource(0, false, nullptr);
 }
 
 Texture::Texture(const Dim& dim, const int samples, const GLenum iformat, const GLenum format, const GLenum type)
@@ -39,10 +39,10 @@ Texture::Texture(const Dim& dim, const int samples, const GLenum iformat, const 
 	assert(samples > 0);
 	assert(samples == 1 || (dim.GetHeight() >= 1 && dim.GetDepth() == 1));
 
-	InitResource(0, nullptr);
+	InitResource(0, false, nullptr);
 }
 
-Texture::Texture(const std::string& path, const GLenum overrideType)
+Texture::Texture(const std::string& path, const ColorSpace colorSpace, const GLenum overrideType)
 	: samples(1)
 {
 	ILuint image;
@@ -100,7 +100,7 @@ Texture::Texture(const std::string& path, const GLenum overrideType)
 		this->type = (type == IL_FLOAT) ? GL_FLOAT : GL_UNSIGNED_BYTE;
 	}
 
-	InitResource(components, ilGetData());
+	InitResource(components, (colorSpace == GammaSpace), ilGetData());
 	ilDeleteImages(1, &image);
 }
 
@@ -136,7 +136,7 @@ GLenum Texture::GetTarget() const
 		return GL_TEXTURE_3D;
 }
 
-void Texture::InitResource(const int components, const ILubyte* pixels)
+void Texture::InitResource(const int components, bool srgb, const ILubyte* pixels)
 {
 	assert(components >= 0 && components <= 4);
 
@@ -153,7 +153,13 @@ void Texture::InitResource(const int components, const ILubyte* pixels)
 		else
 			iformat = iformatLUTi[components];
 	}
-	
+	if(srgb && type != GL_FLOAT) {
+		switch(format) {
+		case GL_RGB:  iformat = GL_SRGB8; break;
+		case GL_RGBA: iformat = GL_SRGB8_ALPHA8; break;
+		}
+	}
+
 	gltry(glGenTextures(1, &id));
 	gltry(glActiveTexture(GL_TEXTURE0));
 	gltry(glBindTexture(target, id));
@@ -209,7 +215,7 @@ void Texture::Generate(const Dim& dim, std::function<vec4(unsigned int, unsigned
 	size.Height = ilGetInteger(IL_IMAGE_HEIGHT);
 	size.Depth  = ilGetInteger(IL_IMAGE_DEPTH);
 
-	InitResource(4, ilGetData());
+	InitResource(4, false, ilGetData());
 	ilDeleteImages(1, &image);
 }
 

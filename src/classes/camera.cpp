@@ -13,7 +13,7 @@ CameraActor::CameraActor() : Actor()
 CameraActor::CameraActor(const vec3& position, const quat& rotation) : Actor(position, rotation)
 {}
 
-mat4& CameraActor::SetPerspective(const float fov, const float zNear, const float zFar)
+mat4& CameraActor::SetPerspective(float fov, float zNear, float zFar)
 {
 	ViewportDim viewport;
 
@@ -21,7 +21,13 @@ mat4& CameraActor::SetPerspective(const float fov, const float zNear, const floa
 	return projection;
 }
 
-mat4& CameraActor::SetOrtho(const Dim& size, const float zNear, const float zFar)
+mat4& CUBE::CameraActor::SetOrtho(float left, float right, float bottom, float top, float zNear, float zFar)
+{
+	projection = glm::ortho(left, right, bottom, top, zNear, zFar);
+	return projection;
+}
+
+mat4& CameraActor::SetOrtho(const Dim& size, float zNear, float zFar)
 {
 	projection = glm::ortho(-0.5f*size.Width, 0.5f*size.Width, -0.5f*size.Height, 0.5f*size.Height, zNear, zFar);
 	return projection;

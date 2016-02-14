@@ -22,6 +22,10 @@ public:
 		Normal,
 		MaxChannels,
 	};
+	enum ColorSpace {
+		LinearSpace = 0,
+		GammaSpace,
+	};
 protected:
 	Dim    size;
 	GLenum iformat;
@@ -31,7 +35,7 @@ protected:
 
 	GLuint id;
 protected:
-	void InitResource(const int components, const ILubyte* pixels);
+	void InitResource(const int components, bool srgb, const ILubyte* pixels);
 	void Generate(const Dim& dim, std::function<vec4(unsigned int, unsigned int)> generator, const GLenum type=GL_UNSIGNED_BYTE);
 	bool DetectFormat();
 
@@ -41,7 +45,7 @@ public:
 	Texture(const Dim& dim, const GLenum iformat, const GLenum format, const GLenum type);
 	Texture(const Dim& dim, const int samples, const GLenum iformat, const GLenum format, const GLenum type);
 
-	Texture(const std::string& path, const GLenum overrideType=GL_NONE);
+	Texture(const std::string& path, const ColorSpace colorSpace=GammaSpace, const GLenum overrideType=GL_NONE);
 	Texture(TextureGenColorType, const Dim& dim, const vec4& color, const GLenum type=GL_UNSIGNED_BYTE);
 	Texture(TextureGenNoiseType, const Dim& dim, unsigned int seed, const GLenum type=GL_UNSIGNED_BYTE);
 	Texture(TextureGenFunctionType, const Dim& dim, std::function<vec4(unsigned int, unsigned int)> generator, const GLenum type=GL_UNSIGNED_BYTE);
